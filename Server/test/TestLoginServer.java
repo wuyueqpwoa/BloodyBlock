@@ -1,7 +1,7 @@
 import game.server.login.LoginServer;
 
 /**
- * 测试游戏世界服务器
+ * 测试登录服务器
  * Created by wuy on 2017/5/21.
  */
 public class TestLoginServer {
