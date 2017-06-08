@@ -7,8 +7,8 @@ import game.server.Server;
  * Created by wuy on 2017/5/24.
  */
 public class GatewayServer extends Server {
-	public GatewayServer(String serverId) {
-		super(serverId);
-	}
+//	public GatewayServer(String serverId) {
+//		super(serverId);
+//	}
 
 }

@@ -2,7 +2,7 @@ package game.server.center;
 
 import game.common.message.CloneableMessageHandler;
 import game.common.message.Message;
-import game.common.message.ServerForServerMessageHandler;
+import game.common.message.ServerMessageHandler;
 import game.common.net.ServerAgent;
 import game.common.net.ServerAgentManager;
 import game.server.Server;
@@ -16,18 +16,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 登录服务器，面向服务端的服务器套接字服务
+ * 中心服务器，面向服务端的消息处理者
  * Created by wuy on 2017/5/25.
  */
-public class CenterServerForServerMessageHandler extends ServerForServerMessageHandler {
+public class CenterServerMessageHandler extends ServerMessageHandler {
 
-	public CenterServerForServerMessageHandler(Server server, ServerAgentManager serverAgentManager) {
-		super(server, serverAgentManager);
+	public CenterServerMessageHandler(Server server) {
+		super(server);
 	}
 
 	@Override
 	public CloneableMessageHandler clone() {
-		return new CenterServerForServerMessageHandler(getServer(), getServerAgentManager());
+		return new CenterServerMessageHandler(getServer());
 	}
 
 	// 登录

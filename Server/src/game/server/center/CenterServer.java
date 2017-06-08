@@ -12,17 +12,17 @@ public class CenterServer extends Server {
 	private ServerAgentManager serverAgentManager;
 	private ServerSocketService centerServerForServerSocketService;
 
-	public CenterServer(String serverId) {
-		super(serverId);
-	}
+//	public CenterServer(String serverId) {
+//		super(serverId);
+//	}
 
 	public void startServerForServerSocketService(String host, int port) {
 		serverAgentManager = new ServerAgentManager();
-		centerServerForServerSocketService = new ServerSocketService(new CenterServerForServerMessageHandler(this, serverAgentManager));
-		try {
-			centerServerForServerSocketService.start(host, port);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		centerServerForServerSocketService = new ServerSocketService();
+//		try {
+//			centerServerForServerSocketService.start(host, port, new CenterServerForServerMessageHandler(this, serverAgentManager));
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 	}
 }

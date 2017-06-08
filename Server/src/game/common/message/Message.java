@@ -18,7 +18,7 @@ import java.util.Map;
 public class Message {
 	// 来源客户端连接ID
 	private Integer sourceConnectId;
-	// 目标服务器ID，格式一定为"服务器类型_编号"，如果是客户端的消息，一般由登录服务器或网关强写本字段
+	// 目标服务器ID，如果是客户端的消息，一般由登录服务器或网关强写本字段
 	private String destinationServerId;
 	// 调用函数名
 	private String invokeMethodName;

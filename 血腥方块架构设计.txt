@@ -1,0 +1,145 @@
+语言模块
+1、【服务器通信层】Java语言，Netty框架，具有缓冲消息，消息广播的能力；
+2、【服务器逻辑层】Python语言，原生Socket与Java交互；
+3、【客户端通信逻辑层】使用Unity开发，支持Socket通信、RSA签名解密的语言即可。
+
+游戏类型
+1、割草游戏，爽快的节奏感、打击感；
+2、超体型怪物的搏杀；
+3、任意崩坏的物体结构。
+
+消息结构
+所有消息均为RPC调用，msgpack作为消息封装。
+为保证客户端调用的安全性，RSA交换通信密钥，AES加密通信。
+
+四种Socket模式
+1、用户客户端模式；
+2、服务器“面向用户”服务端模式；
+3、服务器“面向服务器”客户端模式；
+4、服务器“面向服务器”服务端模式。
+
+精简架构
+全局信息服务器GlobalInfoServer：提供所有服务器的ID、类型、地址和端口信息，所有服务器上线都需要在全局信息服务器注册信息。
+其他服务器只需要连接全局信息服务器，注册自己的信息，并告知全局信息服务器自己感兴趣的服务器信息。
+
+凡是服务器都需要开启服务接收端口。根据全局信息服务器返回来的服务器信息，自主发起连接。
+通过状态控制，达到工作水平。
+
+
+业务
+1、客户端Client直连登录服务器LoginServer验证账号密码；
+2、登录服务器下发游戏世界服务器GameWorldServer列表；
+3、客户端Client切换至网关服务器GatewayServer(登录服务器根据负载算法选择)；
+4、
+
+
+有三种消息：
+1、通信层给通信层消息；
+2、逻辑层给通信层消息；
+3、逻辑层给逻辑层消息。
+玩家客户端通信层和逻辑层一体。
+
+通信层给通信层消息ServerMessage = {
+	s: 来源系统ID,
+	d: 目标系统ID,
+	i: 调用函数名称
+}
+逻辑层给通信层消息SocketMessage = {
+	i: 调用函数名称,
+	c: 目标系统连接ID(网关用),
+	cl: 目标系统连接ID列表(网关用),
+	d: 目标系统ID,
+	dl: 目标系统ID列表
+}
+逻辑层给逻辑层消息LogicMessage = {
+	i: 调用函数名称,
+	p: 函数入参,
+	r: 回调函数名称
+}
+
+
+
+服务器间消息 = [
+	给通信层消息长度,
+	给通信层消息(msgpack),
+	给逻辑层消息长度,
+	给逻辑层消息(msgpack)
+]
+
+给通信层消息 = {
+	s: 来源系统类型,
+	d: 目标系统类型,
+	i: 处理消息函数(名称),
+	m: 消息数据,
+	o: 处理结果回调函数(名称)
+}
+
+给逻辑层消息 = {
+	未知
+}
+
+由来源系统ID和目标系统ID决定消息处理的类，根据给通信层消息当中的处理消息函数的名称，找到具体的函数。
+
+
+消息类型
+1、
+0未知Unknown
+1心跳KeepAlive
+2系统信息SystemInfo
+3远程调用RPC
+
+服务器连接结构
+btc -> gas
+
+bts -> btc
+
+es(gdbs,gtw,ls,gas) -> gbc
+
+gas -> gbc(找es)
+gas -> es
+gas -> dbs
+
+gdbs -> gbc(找es)
+gdbs -> es
+
+gtw -> gbc(找es)
+gtw -> gas
+gtw -> es
+
+ls -> gbc(找es)
+ls -> es
+
+client -> ls
+client -> gtw
+
+agent管理器一般都是共用的，有需要单独的情况吗？
+client：【需要ls的服务，需要gtw的服务】
+ls：【为client提供服务】【需要gdbs的服务，需要gbc的服务】
+gtw：【为client提供服务】【需要gbc的服务？，需要gas的服务】
+gas：【为gtw提供服务，为btc提供服务】【需要gbc的服务？，需要dbs的服务】
+btc：【为bts提供服务】【需要gas的服务】
+bts：【需要btc的服务】
+
+服务器间的信息是相互穿透的，仅仅需要隔离客户端的即可
+服务分四种：
+客户端的ClientSocket，独有ClientAgentManager
+服务器的ServerForClientSocket，独有ClientAgentManager，消息管理器能够访问ServerAgentManager
+服务器的ServerForServerSocket，共享ServerAgentManager
+服务器的ClientSocket，共享ServerAgentManager
+
+AgentManaget是同一个？会相互卡着吧……
+只是能够做到如下能力
+
+
+
+一个游戏世界有多个逻辑场景？
+
+gdbs现实世界(同一玩家唯一账号，如QQ号)
+gas游戏世界(同一玩家多个角色，如路人甲、路人乙)
+btc子游戏世界(XXX线，如帮战线、摆摊线)
+bts副本(如主城场景、暗黑城、天空城)
+
+玩家的角色，同一时间只能在一个bts里
+btc知道是哪个bts，gas知道是哪个btc，gtw知道是那个gas
+
+所以，client的数据直接给gas，gas去找btc，btc去找bts

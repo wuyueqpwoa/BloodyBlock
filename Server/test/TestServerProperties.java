@@ -19,10 +19,10 @@ public class TestServerProperties {
 			LoginServer loginServer = new LoginServer((String) serverId);
 			for (Object serverWay : config2.keySet()) {
 				JSONObject config3 = (JSONObject) config2.get(serverWay);
-				if ("serverForClient".equals(serverWay)) {
+				if ("serverForUser".equals(serverWay)) {
 					String host = (String) config3.get("host");
 					int port = Integer.parseInt((String) config3.get("port"));
-					loginServer.startServerForClientSocketService(host, port);
+					loginServer.startUserSocketService(host, port);
 				}
 				/*else if ("serverForServer".equals(serverWay)) {
 					String host = (String) config3.get("host");

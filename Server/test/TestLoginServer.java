@@ -6,12 +6,12 @@ import game.server.login.LoginServer;
  */
 public class TestLoginServer {
 
-	private static void testServerForClient() {
-		LoginServer loginServer = new LoginServer("LS_01");
-		loginServer.startServerForClientSocketService("127.0.0.1", 18000);
+	private static void testServerForUser() throws Exception {
+		LoginServer loginServer = new LoginServer();
+		loginServer.init();
 	}
 
-	public static void main(String[] args) {
-		testServerForClient();
+	public static void main(String[] args) throws Exception {
+		testServerForUser();
 	}
 }

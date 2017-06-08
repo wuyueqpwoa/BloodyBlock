@@ -8,7 +8,7 @@ import game.server.Server;
  */
 public class GameWorldServer extends Server {
 
-	public GameWorldServer(String serverId) {
-		super(serverId);
-	}
+//	public GameWorldServer(String serverId) {
+//		super(serverId);
+//	}
 }

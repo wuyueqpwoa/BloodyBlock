@@ -2,26 +2,26 @@ package game.common.net;
 
 import game.common.message.MessageDecoder;
 import game.common.message.MessageEncoder;
-import io.netty.bootstrap.ServerBootstrap;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 
 /**
- * 服务端套接字服务
+ * 客户端套接字服务
  * Created by wuy on 2017/5/20.
  */
-public class ServerSocketService extends SocketService {
+public class ClientSocketService extends SocketService {
 
 	private EventLoopGroup eventLoopGroup;
-	private ServerBootstrap serverBootstrap;
+	private Bootstrap bootstrap;
 	private Channel channel;
 
 	/**
-	 * 构造服务端套接字服务
+	 * 构造客户端套接字服务
 	 */
-	public ServerSocketService() {
+	public ClientSocketService() {
 		super();
 	}
 
@@ -29,12 +29,12 @@ public class ServerSocketService extends SocketService {
 	public void startService() throws Exception {
 		getLogger().info("initializing...");
 		eventLoopGroup = new NioEventLoopGroup();
-		serverBootstrap = new ServerBootstrap();
-		serverBootstrap.group(eventLoopGroup);
-		serverBootstrap.channel(NioServerSocketChannel.class);
+		bootstrap = new Bootstrap();
+		bootstrap.group(eventLoopGroup);
+		bootstrap.channel(NioSocketChannel.class);
 		// 保持TCP连接
-		serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
-		serverBootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
+		bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
+		bootstrap.handler(new ChannelInitializer<SocketChannel>() {
 			@Override
 			protected void initChannel(SocketChannel socketChannel) throws Exception {
 				ChannelPipeline channelPipeline = socketChannel.pipeline();
@@ -44,14 +44,14 @@ public class ServerSocketService extends SocketService {
 			}
 		});
 		getLogger().info("initialized.");
-		channel = serverBootstrap.bind(getHost(), getPort()).sync().channel();
+		channel = bootstrap.bind(getHost(), getPort()).sync().channel();
 	}
 
 	@Override
 	public void stopService() {
 		eventLoopGroup.shutdownGracefully();
 		eventLoopGroup = null;
-		serverBootstrap = null;
+		bootstrap = null;
 		channel = null;
 	}
 
