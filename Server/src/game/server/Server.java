@@ -16,9 +16,9 @@ import java.util.Map;
 public class Server {
 
 	// 服务器类型
-	private String type = "Default";
-	// 服务器ID
-	private String id = "Default_01";
+	private String type;
+	// 服务器ID，格式为"服务器类型_编号"
+	private String id;
 	// 服务端套接字服务Map
 	private Map<String, ServerSocketService> serverSocketServiceMap = new LinkedHashMap<>();
 	// 客户端套接字服务Map
@@ -42,6 +42,7 @@ public class Server {
 
 	public void setId(String id) {
 		this.id = id;
+		this.type = id.split("_")[0];
 	}
 
 	public Map<String, ServerSocketService> getServerSocketServiceMap() {
@@ -99,5 +100,17 @@ public class Server {
 	 */
 	public void add(ClientSocketService clientSocketService) {
 		clientSocketServiceMap.put(clientSocketService.getName(), clientSocketService);
+	}
+
+	@Override
+	public String toString() {
+		return "Server{" +
+				"type='" + type + '\'' +
+				", id='" + id + '\'' +
+				", serverSocketServiceMap=" + serverSocketServiceMap +
+				", clientSocketServiceMap=" + clientSocketServiceMap +
+				", userAgentManager=" + userAgentManager +
+				", serverAgentManager=" + serverAgentManager +
+				'}';
 	}
 }

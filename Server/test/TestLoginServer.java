@@ -9,6 +9,7 @@ public class TestLoginServer {
 	private static void testServerForUser() throws Exception {
 		LoginServer loginServer = new LoginServer();
 		loginServer.init();
+		System.out.println(loginServer);
 	}
 
 	public static void main(String[] args) throws Exception {

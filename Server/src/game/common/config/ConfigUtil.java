@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -63,23 +64,32 @@ public class ConfigUtil {
 	 */
 	public static void initServerByConfig(Server server) throws Exception {
 		JSONObject config = ConfigUtil.getServerProperties(server.getClass().getSimpleName());
-		server.setType((String) config.get("type"));
-		server.setId((String) config.get("id"));
-		JSONArray config2 = (JSONArray) config.get("serverSocketService");
-		if (config2 != null) {
-			for (Object o : config2) {
-				JSONObject tempConfig = (JSONObject) o;
+		String id;
+		// 如果服务器设置了id，则读取相应id的配置，否则默认第一个配置
+		if (server.getId() == null) {
+			id = (String) config.keySet().iterator().next();
+			server.setId(id);
+		} else {
+			id = server.getId();
+		}
+		JSONObject config2 = (JSONObject) config.get(id);
+		JSONObject config3 = (JSONObject) config2.get("serverSocketService");
+		if (config3 != null) {
+			for (Object o : config3.entrySet()) {
+				Map.Entry e = (Map.Entry) o;
 				ServerSocketService serverSocketService = new ServerSocketService();
-				initSocketService(serverSocketService, server, tempConfig);
+				serverSocketService.setName((String) e.getKey());
+				initSocketService(serverSocketService, server, (JSONObject) e.getValue());
 				server.add(serverSocketService);
 			}
 		}
-		config2 = (JSONArray) config.get("clientSocketService");
-		if (config2 != null) {
-			for (Object o : config2) {
-				JSONObject tempConfig = (JSONObject) o;
+		config3 = (JSONObject) config2.get("clientSocketService");
+		if (config3 != null) {
+			for (Object o : config3.entrySet()) {
+				Map.Entry e = (Map.Entry) o;
 				ClientSocketService clientSocketService = new ClientSocketService();
-				initSocketService(clientSocketService, server, tempConfig);
+				clientSocketService.setName((String) e.getKey());
+				initSocketService(clientSocketService, server, (JSONObject) e.getValue());
 				server.add(clientSocketService);
 			}
 		}
@@ -94,9 +104,19 @@ public class ConfigUtil {
 	 * @throws Exception 初始化异常
 	 */
 	private static void initSocketService(SocketService socketService, Server server, JSONObject config) throws Exception {
-		socketService.setName((String) config.get("name"));
-		socketService.setHost((String) config.get("host"));
-		socketService.setPort(Integer.parseInt((String) config.get("host")));
+		// host和port可以通过读取别的服务器配置获得
+		if (config.containsKey("targetService")) {
+			String[] targetService = ((String) config.get("targetService")).split("\\.");
+			JSONObject config2 = ConfigUtil.getServerProperties(targetService[0]);
+			config2 = (JSONObject) config2.get(targetService[1]);
+			config2 = (JSONObject) config2.get(targetService[2]);
+			config2 = (JSONObject) config2.get(targetService[3]);
+			socketService.setHost((String) config2.get("host"));
+			socketService.setPort(Integer.parseInt((String) config2.get("port")));
+		} else {
+			socketService.setHost((String) config.get("host"));
+			socketService.setPort(Integer.parseInt((String) config.get("port")));
+		}
 		// 实例化messageHandler
 		String className = (String) config.get("messageHandlerClassName");
 		Class<?> messageHandlerClass = Class.forName(className);

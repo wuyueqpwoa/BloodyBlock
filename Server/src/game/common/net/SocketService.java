@@ -122,4 +122,15 @@ public abstract class SocketService {
 	 * @return 存活，返回true；否则，返回false
 	 */
 	public abstract boolean isAlive();
+
+	@Override
+	public String toString() {
+		return "SocketService{" +
+				"name='" + name + '\'' +
+				", host='" + host + '\'' +
+				", port=" + port +
+				", frameLength=" + frameLength +
+				", cloneableMessageHandler=" + cloneableMessageHandler +
+				'}';
+	}
 }
