@@ -2,7 +2,8 @@ package game.common.net;
 
 import io.netty.channel.Channel;
 
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 服务端代理管理器
@@ -11,9 +12,9 @@ import java.util.Hashtable;
 public class ServerAgentManager extends SocketAgentManager<ServerAgent> {
 
 	// serverId映射到serverAgent
-	private Hashtable<String, ServerAgent> serverIdMap = new Hashtable<>();
+	private Map<String, ServerAgent> serverIdMap = new LinkedHashMap<>();
 
-	public Hashtable<String, ServerAgent> getServerIdMap() {
+	public Map<String, ServerAgent> getServerIdMap() {
 		return serverIdMap;
 	}
 
@@ -24,7 +25,7 @@ public class ServerAgentManager extends SocketAgentManager<ServerAgent> {
 	 * @param isServer 是否以服务器模式启动
 	 * @return 服务端代理
 	 */
-	public ServerAgent add(Channel channel, boolean isServer) {
+	synchronized public ServerAgent add(Channel channel, boolean isServer) {
 		return add(new ServerAgent(channel, isServer));
 	}
 
@@ -35,7 +36,7 @@ public class ServerAgentManager extends SocketAgentManager<ServerAgent> {
 	 * @param serverId    服务器ID
 	 * @return 成功，返回true；失败 ，返回false
 	 */
-	public boolean updateServerId(ServerAgent serverAgent, String serverId) {
+	synchronized public boolean updateServerId(ServerAgent serverAgent, String serverId) {
 		if (serverId == null) {
 			return false;
 		}
@@ -55,7 +56,7 @@ public class ServerAgentManager extends SocketAgentManager<ServerAgent> {
 	 * @param serverId 服务器ID
 	 * @return 包含，返回true；不包含，返回false
 	 */
-	public boolean contains(String serverId) {
+	synchronized public boolean contains(String serverId) {
 		return serverIdMap.containsKey(serverId);
 	}
 
@@ -65,7 +66,7 @@ public class ServerAgentManager extends SocketAgentManager<ServerAgent> {
 	 * @param serverId 服务器ID
 	 * @return 套接字代理
 	 */
-	public ServerAgent get(String serverId) {
+	synchronized public ServerAgent get(String serverId) {
 		return serverIdMap.get(serverId);
 	}
 
@@ -75,7 +76,7 @@ public class ServerAgentManager extends SocketAgentManager<ServerAgent> {
 	 * @param channel 通道
 	 * @return 成功，返回true；失败 ，返回false
 	 */
-	public ServerAgent remove(Channel channel) {
+	synchronized public ServerAgent remove(Channel channel) {
 		if (!contains(channel)) {
 			return null;
 		}
@@ -94,7 +95,7 @@ public class ServerAgentManager extends SocketAgentManager<ServerAgent> {
 	 * @param connectId 连接ID
 	 * @return 成功，返回true；失败 ，返回false
 	 */
-	public ServerAgent remove(Integer connectId) {
+	synchronized public ServerAgent remove(Integer connectId) {
 		if (!contains(connectId)) {
 			return null;
 		}
@@ -113,7 +114,7 @@ public class ServerAgentManager extends SocketAgentManager<ServerAgent> {
 	 * @param serverId 服务器ID
 	 * @return 成功，返回true；失败 ，返回false
 	 */
-	public ServerAgent remove(String serverId) {
+	synchronized public ServerAgent remove(String serverId) {
 		if (!serverIdMap.containsKey(serverId)) {
 			return null;
 		}

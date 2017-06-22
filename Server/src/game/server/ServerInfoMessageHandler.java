@@ -19,15 +19,6 @@ import java.util.Map;
  */
 public class ServerInfoMessageHandler extends ServerMessageHandler {
 
-	public ServerInfoMessageHandler(Server server) {
-		super(server);
-	}
-
-	@Override
-	public CloneableMessageHandler clone() {
-		return new ServerInfoMessageHandler(getServer());
-	}
-
 	// 登录
 	public void login(ServerAgent serverAgent, Message message) throws IOException {
 		MessagePack messagePack = new MessagePack();

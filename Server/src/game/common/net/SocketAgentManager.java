@@ -3,7 +3,8 @@ package game.common.net;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelId;
 
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 套接字代理管理器
@@ -12,15 +13,15 @@ import java.util.Hashtable;
 public class SocketAgentManager<T extends SocketAgent> {
 
 	// channelId映射到socketAgent
-	private Hashtable<ChannelId, T> channelIdMap = new Hashtable<>();
+	private Map<ChannelId, T> channelIdMap = new LinkedHashMap<>();
 	// connectId映射到socketAgent
-	private Hashtable<Integer, T> connectIdMap = new Hashtable<>();
+	private Map<Integer, T> connectIdMap = new LinkedHashMap<>();
 
-	public Hashtable<ChannelId, T> getChannelIdMap() {
+	public Map<ChannelId, T> getChannelIdMap() {
 		return channelIdMap;
 	}
 
-	public Hashtable<Integer, T> getConnectIdMap() {
+	public Map<Integer, T> getConnectIdMap() {
 		return connectIdMap;
 	}
 
@@ -30,7 +31,7 @@ public class SocketAgentManager<T extends SocketAgent> {
 	 * @param socketAgent 套接字代理
 	 * @return 套接字代理
 	 */
-	public T add(T socketAgent) {
+	synchronized public T add(T socketAgent) {
 		// 清除旧关系
 		remove(socketAgent.getChannel());
 		channelIdMap.put(socketAgent.getChannel().id(), socketAgent);
@@ -44,7 +45,7 @@ public class SocketAgentManager<T extends SocketAgent> {
 	 * @param channel 通道
 	 * @return 包含，返回true；不包含，返回false
 	 */
-	public boolean contains(Channel channel) {
+	synchronized public boolean contains(Channel channel) {
 		return channelIdMap.containsKey(channel.id());
 	}
 
@@ -54,7 +55,7 @@ public class SocketAgentManager<T extends SocketAgent> {
 	 * @param connectId 连接ID
 	 * @return 包含，返回true；不包含，返回false
 	 */
-	public boolean contains(Integer connectId) {
+	synchronized public boolean contains(Integer connectId) {
 		return connectIdMap.containsKey(connectId);
 	}
 
@@ -64,7 +65,7 @@ public class SocketAgentManager<T extends SocketAgent> {
 	 * @param channel 通道
 	 * @return 套接字代理
 	 */
-	public T get(Channel channel) {
+	synchronized public T get(Channel channel) {
 		return channelIdMap.get(channel.id());
 	}
 
@@ -74,7 +75,7 @@ public class SocketAgentManager<T extends SocketAgent> {
 	 * @param connectId 连接ID
 	 * @return 套接字代理
 	 */
-	public T get(Integer connectId) {
+	synchronized public T get(Integer connectId) {
 		return connectIdMap.get(connectId);
 	}
 
@@ -84,7 +85,7 @@ public class SocketAgentManager<T extends SocketAgent> {
 	 * @param channel 通道
 	 * @return 成功，返回true；失败 ，返回false
 	 */
-	public T remove(Channel channel) {
+	synchronized public T remove(Channel channel) {
 		if (!channelIdMap.containsKey(channel.id())) {
 			return null;
 		}
@@ -99,12 +100,21 @@ public class SocketAgentManager<T extends SocketAgent> {
 	 * @param connectId 连接ID
 	 * @return 成功，返回true；失败 ，返回false
 	 */
-	public T remove(Integer connectId) {
+	synchronized public T remove(Integer connectId) {
 		if (!connectIdMap.containsKey(connectId)) {
 			return null;
 		}
 		T socketAgent = connectIdMap.remove(connectId);
 		channelIdMap.remove(socketAgent.getChannel().id());
 		return socketAgent;
+	}
+
+	/**
+	 * 获得套接字代理数量
+	 *
+	 * @return 套接字代理数量
+	 */
+	synchronized public int size() {
+		return connectIdMap.size();
 	}
 }

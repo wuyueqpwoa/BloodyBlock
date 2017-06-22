@@ -14,7 +14,7 @@ public class UserAgentManager extends SocketAgentManager<UserAgent> {
 	 * @param channel 通道
 	 * @return 用户端代理
 	 */
-	public UserAgent add(Channel channel) {
+	synchronized public UserAgent add(Channel channel) {
 		return add(new UserAgent(channel));
 	}
 }

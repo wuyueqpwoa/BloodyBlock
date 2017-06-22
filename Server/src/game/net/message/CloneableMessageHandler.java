@@ -1,5 +1,6 @@
-package game.common.message;
+package game.net.message;
 
+import game.common.message.MessageQueue;
 import game.common.net.ServerAgentManager;
 import game.common.net.SocketService;
 import game.common.net.UserAgentManager;
@@ -10,16 +11,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 可克隆的消息处理者
- * Created by wuy on 2017/5/26.
+ * Created by wuy on 2017/6/22.
  */
 public abstract class CloneableMessageHandler extends SimpleChannelInboundHandler<byte[]> implements Cloneable {
 
-	final private Logger logger;
+	final private Logger logger = LoggerFactory.getLogger(this.getClass());
 	private SocketService socketService;
-
-	public CloneableMessageHandler() {
-		logger = LoggerFactory.getLogger(this.getClass());
-	}
 
 	public Logger getLogger() {
 		return logger;

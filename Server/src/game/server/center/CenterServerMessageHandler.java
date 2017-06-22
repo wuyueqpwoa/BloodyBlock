@@ -1,11 +1,8 @@
 package game.server.center;
 
-import game.common.message.CloneableMessageHandler;
 import game.common.message.Message;
 import game.common.message.ServerMessageHandler;
 import game.common.net.ServerAgent;
-import game.common.net.ServerAgentManager;
-import game.server.Server;
 import org.msgpack.MessagePack;
 import org.msgpack.type.MapValue;
 
@@ -20,15 +17,6 @@ import java.util.Map;
  * Created by wuy on 2017/5/25.
  */
 public class CenterServerMessageHandler extends ServerMessageHandler {
-
-	public CenterServerMessageHandler(Server server) {
-		super(server);
-	}
-
-	@Override
-	public CloneableMessageHandler clone() {
-		return new CenterServerMessageHandler(getServer());
-	}
 
 	// 登录
 	public void login(ServerAgent serverAgent, Message message) throws IOException {

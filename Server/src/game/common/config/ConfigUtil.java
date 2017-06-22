@@ -1,6 +1,7 @@
 package game.common.config;
 
 import game.common.message.CloneableMessageHandler;
+import game.common.message.ServerMessageHandler;
 import game.common.net.ClientSocketService;
 import game.common.net.ServerSocketService;
 import game.common.net.SocketService;
@@ -79,6 +80,11 @@ public class ConfigUtil {
 				Map.Entry e = (Map.Entry) o;
 				ServerSocketService serverSocketService = new ServerSocketService();
 				serverSocketService.setName((String) e.getKey());
+				// 设置消息处理者
+				ServerMessageHandler serverMessageHandler = new ServerMessageHandler();
+				serverMessageHandler.setSocketService(serverSocketService);
+				serverSocketService.setCloneableMessageHandler(serverMessageHandler);
+				// 初始化其它配置
 				initSocketService(serverSocketService, server, (JSONObject) e.getValue());
 				server.add(serverSocketService);
 			}
@@ -89,6 +95,11 @@ public class ConfigUtil {
 				Map.Entry e = (Map.Entry) o;
 				ClientSocketService clientSocketService = new ClientSocketService();
 				clientSocketService.setName((String) e.getKey());
+				// 设置消息处理者
+				ServerMessageHandler clientMessageHandler = new ServerMessageHandler();
+				clientMessageHandler.setSocketService(clientSocketService);
+				clientSocketService.setCloneableMessageHandler(clientMessageHandler);
+				// 初始化其它配置
 				initSocketService(clientSocketService, server, (JSONObject) e.getValue());
 				server.add(clientSocketService);
 			}
@@ -117,11 +128,7 @@ public class ConfigUtil {
 			socketService.setHost((String) config.get("host"));
 			socketService.setPort(Integer.parseInt((String) config.get("port")));
 		}
-		// 实例化messageHandler
-		String className = (String) config.get("messageHandlerClassName");
-		Class<?> messageHandlerClass = Class.forName(className);
-		Constructor constructor = messageHandlerClass.getConstructor(Server.class);
-		CloneableMessageHandler messageHandler = (CloneableMessageHandler) constructor.newInstance(server);
-		socketService.setCloneableMessageHandler(messageHandler);
+		// 关联服务器和服务
+		socketService.setServer(server);
 	}
 }

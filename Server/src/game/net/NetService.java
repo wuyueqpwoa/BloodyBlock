@@ -1,4 +1,4 @@
-package game.common.net;
+package game.net;
 
 import game.common.message.CloneableMessageHandler;
 import game.server.Server;
@@ -6,12 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 套接字服务(多线程)
- * Created by wuy on 2017/6/8.
+ * 网络服务(多线程)
+ * Created by wuy on 2017/6/22.
  */
-public abstract class SocketService {
+public abstract class NetService {
 
-	final private Logger logger;
+	final private Logger logger = LoggerFactory.getLogger(this.getClass());
 	// 服务器
 	private Server server;
 	// 服务名称
@@ -24,10 +24,6 @@ public abstract class SocketService {
 	private int frameLength = 1024 * 1024 * 10;
 	// 可克隆的消息处理者
 	private CloneableMessageHandler cloneableMessageHandler;
-
-	public SocketService() {
-		logger = LoggerFactory.getLogger(this.getClass());
-	}
 
 	public Logger getLogger() {
 		return logger;
@@ -136,7 +132,7 @@ public abstract class SocketService {
 
 	@Override
 	public String toString() {
-		return "SocketService{" +
+		return "NetService{" +
 				"server=" + server +
 				", name='" + name + '\'' +
 				", host='" + host + '\'' +

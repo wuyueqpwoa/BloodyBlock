@@ -4,22 +4,16 @@ import game.common.net.UserAgent;
 import game.common.security.AESUtil;
 import game.common.security.RSAPrivateKeyUtil;
 import game.common.security.RSAPublicKeyUtil;
-import game.server.Server;
 import io.netty.channel.ChannelHandlerContext;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 
 /**
  * 面向用户端的消息处理者
  * Created by wuy on 2017/5/16.
  */
-public abstract class UserMessageHandler extends CloneableMessageHandler {
-
-	public UserMessageHandler(Server server) {
-		super(server);
-	}
+public class UserMessageHandler extends CloneableMessageHandler {
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, byte[] bytes) throws Exception {
@@ -35,16 +29,17 @@ public abstract class UserMessageHandler extends CloneableMessageHandler {
 		}
 		// 解包
 		Message message = Message.unpack(bytes);
-		getLogger().info("message:" + message);
-		String invokeMethodName = message.getInvokeMethodName();
-		Method method = this.getClass().getMethod(invokeMethodName, UserAgent.class, Message.class);
-		method.invoke(this, userAgent, message);
+		getMessageQueue().putLast(message);
+//		getLogger().info("message:" + message);
+//		String invokeMethodName = message.getInvokeMethodName();
+//		Method method = this.getClass().getMethod(invokeMethodName, UserAgent.class, Message.class);
+//		method.invoke(this, userAgent, message);
 	}
 
 	// 连接上时被调用
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		getLogger().info("channelActive:" + ctx.channel());
+		getLogger().info("channel active:" + ctx.channel());
 		getUserAgentManager().add(ctx.channel());
 		super.channelActive(ctx);
 	}
@@ -52,7 +47,7 @@ public abstract class UserMessageHandler extends CloneableMessageHandler {
 	// 连接断开时被调用
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		getLogger().info("channelInactive:" + ctx.channel());
+		getLogger().info("channel inactive:" + ctx.channel());
 		getUserAgentManager().remove(ctx.channel());
 		super.channelInactive(ctx);
 	}

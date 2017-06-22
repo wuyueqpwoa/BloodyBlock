@@ -1,11 +1,9 @@
 package game.server.login;
 
-import game.common.message.CloneableMessageHandler;
 import game.common.message.Message;
 import game.common.message.UserMessageHandler;
 import game.common.net.UserAgent;
 import game.common.security.AESUtil;
-import game.server.Server;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.msgpack.MessagePack;
 import org.msgpack.template.Templates;
@@ -19,15 +17,6 @@ import java.util.*;
  * Created by wuy on 2017/5/25.
  */
 public class LoginUserMessageHandler extends UserMessageHandler {
-
-	public LoginUserMessageHandler(Server server) {
-		super(server);
-	}
-
-	@Override
-	public CloneableMessageHandler clone() {
-		return new LoginUserMessageHandler(getServer());
-	}
 
 	// 握手
 	public void shakeHand(UserAgent userAgent, Message message) throws IOException {
