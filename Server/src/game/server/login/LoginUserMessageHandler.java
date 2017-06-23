@@ -3,7 +3,7 @@ package game.server.login;
 import game.common.message.Message;
 import game.common.message.UserMessageHandler;
 import game.common.net.UserAgent;
-import game.common.security.AESUtil;
+import game.net.security.AESUtil;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.msgpack.MessagePack;
 import org.msgpack.template.Templates;

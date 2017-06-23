@@ -1,7 +1,8 @@
-package game.common.net;
+package game.net;
 
-import game.common.message.MessageDecoder;
-import game.common.message.MessageEncoder;
+import game.net.message.MessageDecoder;
+import game.net.message.MessageEncoder;
+import game.net.message.UserMessageHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -9,21 +10,14 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 /**
- * 服务端套接字服务
+ * 用户网络服务，向用户提供服务
  * Created by wuy on 2017/5/20.
  */
-public class ServerSocketService extends SocketService {
+public class UserNetService extends NetService {
 
 	private EventLoopGroup eventLoopGroup;
 	private ServerBootstrap serverBootstrap;
 	private Channel channel;
-
-	/**
-	 * 构造服务端套接字服务
-	 */
-	public ServerSocketService() {
-		super();
-	}
 
 	@Override
 	public void startService() throws Exception {
@@ -34,17 +28,20 @@ public class ServerSocketService extends SocketService {
 		serverBootstrap.channel(NioServerSocketChannel.class);
 		// 保持TCP连接
 		serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
+		UserNetService context = this;
 		serverBootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
 			@Override
 			protected void initChannel(SocketChannel socketChannel) throws Exception {
 				ChannelPipeline channelPipeline = socketChannel.pipeline();
 				channelPipeline.addLast("decoder", new MessageDecoder(getFrameLength()));
 				channelPipeline.addLast("encoder", new MessageEncoder());
-				channelPipeline.addLast(getCloneableMessageHandler().clone());
+				UserMessageHandler userMessageHandler = new UserMessageHandler();
+				userMessageHandler.setAgentManager(context.getServer().getServerAgentManager());
+				userMessageHandler.setMessageManager(context.getServer().getMessageManager());
+				userMessageHandler.setUserAgentManager(context.getServer().getUserAgentManager());
+				channelPipeline.addLast(userMessageHandler);
 			}
 		});
-		getLogger().info("initialized.");
-		channel = serverBootstrap.bind(getHost(), getPort()).sync().channel();
 	}
 
 	@Override

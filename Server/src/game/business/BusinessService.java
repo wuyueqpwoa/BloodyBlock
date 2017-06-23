@@ -1,6 +1,6 @@
-package game.server;
+package game.business;
 
-import game.common.message.MessageQueue;
+import game.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,13 +11,9 @@ import org.slf4j.LoggerFactory;
  */
 public class BusinessService {
 
-	final private Logger logger;
+	final private Logger logger = LoggerFactory.getLogger(this.getClass());
 	// 服务器
 	private Server server;
-
-	public BusinessService() {
-		logger = LoggerFactory.getLogger(this.getClass());
-	}
 
 	public Logger getLogger() {
 		return logger;
@@ -29,9 +25,5 @@ public class BusinessService {
 
 	public void setServer(Server server) {
 		this.server = server;
-	}
-
-	public MessageQueue getMessageQueue() {
-		return server.getMessageQueue();
 	}
 }

@@ -1,5 +1,6 @@
 package game.net.message;
 
+import game.net.Agent;
 import game.net.AgentManager;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -16,6 +17,10 @@ public class MessageHandler extends SimpleChannelInboundHandler<byte[]> {
 	final private Logger logger = LoggerFactory.getLogger(this.getClass());
 	private AgentManager agentManager;
 	private MessageManager messageManager;
+
+	public Logger getLogger() {
+		return logger;
+	}
 
 	public AgentManager getAgentManager() {
 		return agentManager;
@@ -45,7 +50,7 @@ public class MessageHandler extends SimpleChannelInboundHandler<byte[]> {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		logger.info("channelActive:" + ctx.channel());
-		agentManager.add(ctx.channel());
+		agentManager.add(ctx.channel(), Agent.class);
 		super.channelActive(ctx);
 	}
 

@@ -1,11 +1,9 @@
 package game.server;
 
-import game.common.config.ConfigUtil;
-import game.common.message.MessageQueue;
-import game.common.net.ClientSocketService;
-import game.common.net.ServerAgentManager;
-import game.common.net.ServerSocketService;
-import game.common.net.UserAgentManager;
+import game.business.BusinessService;
+import game.net.*;
+import game.util.ConfigUtil;
+import game.net.message.MessageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,26 +16,25 @@ import java.util.Map;
  */
 public class Server {
 
-	final private Logger logger;
+	final private Logger logger = LoggerFactory.getLogger(this.getClass());
 	// 服务器类型
 	private String type;
 	// 服务器ID，格式为"服务器类型_编号"
 	private String id;
-	// 服务端套接字服务Map
-	private Map<String, ServerSocketService> serverSocketServiceMap = new LinkedHashMap<>();
-	// 客户端套接字服务Map
-	private Map<String, ClientSocketService> clientSocketServiceMap = new LinkedHashMap<>();
-	// 服务端代理管理器
-	private ServerAgentManager serverAgentManager = new ServerAgentManager();
+	// 服务器服务端网络服务Map
+	private Map<String, ServerNetService> serverNetServiceMap = new LinkedHashMap<>();
+	// 服务器客户端网络服务Map
+	private Map<String, ClientNetService> clientNetServiceMap = new LinkedHashMap<>();
+	// 服务器代理管理器
+	private AgentManager<ServerAgent> serverAgentManager = new AgentManager<>();
 	// 用户代理管理器
-	private UserAgentManager userAgentManager = new UserAgentManager();
-	// 消息队列
-	private MessageQueue messageQueue = new MessageQueue();
+	private AgentManager<UserAgent> userAgentManager = new AgentManager<>();
+	// 消息管理器
+	private MessageManager messageManager = new MessageManager();
 	// 业务服务
 	private BusinessService businessService = new BusinessService();
 
 	public Server() {
-		logger = LoggerFactory.getLogger(this.getClass());
 		businessService.setServer(this);
 	}
 
@@ -62,44 +59,44 @@ public class Server {
 		this.type = id.split("_")[0];
 	}
 
-	public Map<String, ServerSocketService> getServerSocketServiceMap() {
-		return serverSocketServiceMap;
+	public Map<String, ServerNetService> getServerNetServiceMap() {
+		return serverNetServiceMap;
 	}
 
-	public void setServerSocketServiceMap(Map<String, ServerSocketService> serverSocketServiceMap) {
-		this.serverSocketServiceMap = serverSocketServiceMap;
+	public void setServerNetServiceMap(Map<String, ServerNetService> serverNetServiceMap) {
+		this.serverNetServiceMap = serverNetServiceMap;
 	}
 
-	public Map<String, ClientSocketService> getClientSocketServiceMap() {
-		return clientSocketServiceMap;
+	public Map<String, ClientNetService> getClientNetServiceMap() {
+		return clientNetServiceMap;
 	}
 
-	public void setClientSocketServiceMap(Map<String, ClientSocketService> clientSocketServiceMap) {
-		this.clientSocketServiceMap = clientSocketServiceMap;
+	public void setClientNetServiceMap(Map<String, ClientNetService> clientNetServiceMap) {
+		this.clientNetServiceMap = clientNetServiceMap;
 	}
 
-	public ServerAgentManager getServerAgentManager() {
+	public AgentManager<ServerAgent> getServerAgentManager() {
 		return serverAgentManager;
 	}
 
-	public void setServerAgentManager(ServerAgentManager serverAgentManager) {
+	public void setServerAgentManager(AgentManager<ServerAgent> serverAgentManager) {
 		this.serverAgentManager = serverAgentManager;
 	}
 
-	public UserAgentManager getUserAgentManager() {
+	public AgentManager<UserAgent> getUserAgentManager() {
 		return userAgentManager;
 	}
 
-	public void setUserAgentManager(UserAgentManager userAgentManager) {
+	public void setUserAgentManager(AgentManager<UserAgent> userAgentManager) {
 		this.userAgentManager = userAgentManager;
 	}
 
-	public MessageQueue getMessageQueue() {
-		return messageQueue;
+	public MessageManager getMessageManager() {
+		return messageManager;
 	}
 
-	public void setMessageQueue(MessageQueue messageQueue) {
-		this.messageQueue = messageQueue;
+	public void setMessageManager(MessageManager messageManager) {
+		this.messageManager = messageManager;
 	}
 
 	public BusinessService getBusinessService() {
@@ -120,19 +117,19 @@ public class Server {
 	/**
 	 * 添加服务端套接字服务
 	 *
-	 * @param serverSocketService 服务端套接字服务
+	 * @param serverNetService 服务端套接字服务
 	 */
-	public void add(ServerSocketService serverSocketService) {
-		serverSocketServiceMap.put(serverSocketService.getName(), serverSocketService);
+	public void add(ServerNetService serverNetService) {
+		serverNetServiceMap.put(serverNetService.getName(), serverNetService);
 	}
 
 	/**
 	 * 客户端套接字服务
 	 *
-	 * @param clientSocketService 客户端套接字服务
+	 * @param clientNetService 客户端套接字服务
 	 */
-	public void add(ClientSocketService clientSocketService) {
-		clientSocketServiceMap.put(clientSocketService.getName(), clientSocketService);
+	public void add(ClientNetService clientNetService) {
+		clientNetServiceMap.put(clientNetService.getName(), clientNetService);
 	}
 
 	@Override
@@ -140,8 +137,8 @@ public class Server {
 		return "Server{" +
 				"type='" + type + '\'' +
 				", id='" + id + '\'' +
-				", serverSocketServiceMap size=" + serverSocketServiceMap.size() +
-				", clientSocketServiceMap size=" + clientSocketServiceMap.size() +
+				", serverNetServiceMap size=" + serverNetServiceMap.size() +
+				", clientNetServiceMap size=" + clientNetServiceMap.size() +
 				", serverAgentManager size=" + serverAgentManager.size() +
 				", userAgentManager size=" + userAgentManager.size() +
 				'}';

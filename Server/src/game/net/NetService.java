@@ -1,6 +1,5 @@
 package game.net;
 
-import game.common.message.CloneableMessageHandler;
 import game.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +21,6 @@ public abstract class NetService {
 	private int port;
 	// 最大帧长度10Mb=1310720B
 	private int frameLength = 1024 * 1024 * 10;
-	// 可克隆的消息处理者
-	private CloneableMessageHandler cloneableMessageHandler;
 
 	public Logger getLogger() {
 		return logger;
@@ -67,14 +64,6 @@ public abstract class NetService {
 
 	public void setFrameLength(int frameLength) {
 		this.frameLength = frameLength;
-	}
-
-	public CloneableMessageHandler getCloneableMessageHandler() {
-		return cloneableMessageHandler;
-	}
-
-	public void setCloneableMessageHandler(CloneableMessageHandler cloneableMessageHandler) {
-		this.cloneableMessageHandler = cloneableMessageHandler;
 	}
 
 	/**
@@ -138,7 +127,6 @@ public abstract class NetService {
 				", host='" + host + '\'' +
 				", port=" + port +
 				", frameLength=" + frameLength +
-				", cloneableMessageHandler=" + cloneableMessageHandler +
 				'}';
 	}
 }

@@ -10,11 +10,11 @@ public class Agent {
 
 	private Channel channel;
 
-	public Agent(Channel channel) {
-		this.channel = channel;
-	}
-
 	public Channel getChannel() {
 		return channel;
+	}
+
+	public void setChannel(Channel channel) {
+		this.channel = channel;
 	}
 }

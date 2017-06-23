@@ -1,15 +1,12 @@
-package game.common.net;
-
-import io.netty.channel.Channel;
+package game.net;
 
 import javax.crypto.SecretKey;
 
 /**
- * 用户端代理
- * 套接字连接以通道为单位，对该通道进行封装
- * Created by wuy on 2017/5/25.
+ * 用户代理
+ * Created by wuy on 2017/6/22.
  */
-public class UserAgent extends SocketAgent {
+public class UserAgent extends Agent {
 
 	// 600000毫秒=10分钟
 	final private static long MAX_TOKEN_VALID_TIME = 600000;
@@ -20,10 +17,6 @@ public class UserAgent extends SocketAgent {
 	private String token;
 	// token有效期
 	private long tokenValidTime;
-
-	public UserAgent(Channel channel) {
-		super(channel);
-	}
 
 	public SecretKey getAesKey() {
 		return aesKey;

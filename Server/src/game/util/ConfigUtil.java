@@ -1,12 +1,9 @@
-package game.common.config;
+package game.util;
 
-import game.common.message.CloneableMessageHandler;
-import game.common.message.ServerMessageHandler;
-import game.common.net.ClientSocketService;
-import game.common.net.ServerSocketService;
-import game.common.net.SocketService;
+import game.net.ClientNetService;
+import game.net.NetService;
+import game.net.ServerNetService;
 import game.server.Server;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -14,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.Map;
 import java.util.Properties;
 
@@ -74,34 +70,26 @@ public class ConfigUtil {
 			id = server.getId();
 		}
 		JSONObject config2 = (JSONObject) config.get(id);
-		JSONObject config3 = (JSONObject) config2.get("serverSocketService");
+		JSONObject config3 = (JSONObject) config2.get("serverNetService");
 		if (config3 != null) {
 			for (Object o : config3.entrySet()) {
 				Map.Entry e = (Map.Entry) o;
-				ServerSocketService serverSocketService = new ServerSocketService();
-				serverSocketService.setName((String) e.getKey());
-				// 设置消息处理者
-				ServerMessageHandler serverMessageHandler = new ServerMessageHandler();
-				serverMessageHandler.setSocketService(serverSocketService);
-				serverSocketService.setCloneableMessageHandler(serverMessageHandler);
+				ServerNetService serverNetService = new ServerNetService();
+				serverNetService.setName((String) e.getKey());
 				// 初始化其它配置
-				initSocketService(serverSocketService, server, (JSONObject) e.getValue());
-				server.add(serverSocketService);
+				initNetService(serverNetService, server, (JSONObject) e.getValue());
+				server.add(serverNetService);
 			}
 		}
-		config3 = (JSONObject) config2.get("clientSocketService");
+		config3 = (JSONObject) config2.get("clientNetService");
 		if (config3 != null) {
 			for (Object o : config3.entrySet()) {
 				Map.Entry e = (Map.Entry) o;
-				ClientSocketService clientSocketService = new ClientSocketService();
-				clientSocketService.setName((String) e.getKey());
-				// 设置消息处理者
-				ServerMessageHandler clientMessageHandler = new ServerMessageHandler();
-				clientMessageHandler.setSocketService(clientSocketService);
-				clientSocketService.setCloneableMessageHandler(clientMessageHandler);
+				ClientNetService clientNetService = new ClientNetService();
+				clientNetService.setName((String) e.getKey());
 				// 初始化其它配置
-				initSocketService(clientSocketService, server, (JSONObject) e.getValue());
-				server.add(clientSocketService);
+				initNetService(clientNetService, server, (JSONObject) e.getValue());
+				server.add(clientNetService);
 			}
 		}
 	}
@@ -114,7 +102,7 @@ public class ConfigUtil {
 	 * @param config        配置
 	 * @throws Exception 初始化异常
 	 */
-	private static void initSocketService(SocketService socketService, Server server, JSONObject config) throws Exception {
+	private static void initNetService(NetService socketService, Server server, JSONObject config) throws Exception {
 		// host和port可以通过读取别的服务器配置获得
 		if (config.containsKey("targetService")) {
 			String[] targetService = ((String) config.get("targetService")).split("\\.");

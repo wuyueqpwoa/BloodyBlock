@@ -1,4 +1,4 @@
-package game.server;
+package game.business;
 
 /**
  * 业务

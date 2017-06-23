@@ -1,4 +1,4 @@
-package game.common.message;
+package game.net.message;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

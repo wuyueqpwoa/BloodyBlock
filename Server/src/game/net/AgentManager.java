@@ -9,19 +9,26 @@ import java.util.Map;
  * 代理管理器
  * Created by wuy on 2017/6/22.
  */
-public class AgentManager {
+public class AgentManager<T extends Agent> {
 
-	private Map<String, Agent> agentMap = new LinkedHashMap<>();
+	private Map<String, T> agentMap = new LinkedHashMap<>();
 
 	/**
 	 * 添加代理
 	 *
-	 * @param channel 通道
+	 * @param channel    通道
+	 * @param agentClass 代理类
 	 */
-	synchronized public Agent add(Channel channel) {
-		Agent agent = new Agent(channel);
-		agentMap.put(channel.id().asShortText(), agent);
-		return agent;
+	synchronized public T add(Channel channel, Class agentClass) {
+		try {
+			T agent = (T) agentClass.newInstance();
+			agent.setChannel(channel);
+			agentMap.put(channel.id().asShortText(), agent);
+			return agent;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -30,7 +37,7 @@ public class AgentManager {
 	 * @param channel 通道
 	 * @return 代理
 	 */
-	synchronized public Agent get(Channel channel) {
+	synchronized public T get(Channel channel) {
 		return agentMap.get(channel.id().asShortText());
 	}
 
@@ -40,7 +47,7 @@ public class AgentManager {
 	 * @param id ID
 	 * @return 代理
 	 */
-	synchronized public Agent get(String id) {
+	synchronized public T get(String id) {
 		return agentMap.get(id);
 	}
 
@@ -50,7 +57,7 @@ public class AgentManager {
 	 * @param channel 通道
 	 * @return 代理
 	 */
-	synchronized public Agent remove(Channel channel) {
+	synchronized public T remove(Channel channel) {
 		return agentMap.remove(channel.id().asShortText());
 	}
 
@@ -60,7 +67,16 @@ public class AgentManager {
 	 * @param id ID
 	 * @return 代理
 	 */
-	synchronized public Agent remove(String id) {
+	synchronized public T remove(String id) {
 		return agentMap.remove(id);
+	}
+
+	/**
+	 * 获得管理中的代理数量
+	 *
+	 * @return 管理中的代理数量
+	 */
+	synchronized public int size() {
+		return agentMap.size();
 	}
 }
