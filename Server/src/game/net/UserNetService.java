@@ -36,12 +36,12 @@ public class UserNetService extends NetService {
 				channelPipeline.addLast("decoder", new MessageDecoder(getFrameLength()));
 				channelPipeline.addLast("encoder", new MessageEncoder());
 				UserMessageHandler userMessageHandler = new UserMessageHandler();
-				userMessageHandler.setAgentManager(context.getServer().getServerAgentManager());
-				userMessageHandler.setMessageManager(context.getServer().getMessageManager());
-				userMessageHandler.setUserAgentManager(context.getServer().getUserAgentManager());
+				userMessageHandler.setServer(context.getServer());
 				channelPipeline.addLast(userMessageHandler);
 			}
 		});
+		getLogger().info("initialized.");
+		channel = serverBootstrap.bind(getHost(), getPort()).sync().channel();
 	}
 
 	@Override

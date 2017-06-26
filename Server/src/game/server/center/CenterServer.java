@@ -1,7 +1,5 @@
 package game.server.center;
 
-import game.common.net.ServerAgentManager;
-import game.common.net.ServerSocketService;
 import game.server.Server;
 
 /**
@@ -9,20 +7,5 @@ import game.server.Server;
  * Created by wuy on 2017/5/26.
  */
 public class CenterServer extends Server {
-	private ServerAgentManager serverAgentManager;
-	private ServerSocketService centerServerForServerSocketService;
 
-//	public CenterServer(String serverId) {
-//		super(serverId);
-//	}
-
-	public void startServerForServerSocketService(String host, int port) {
-		serverAgentManager = new ServerAgentManager();
-		centerServerForServerSocketService = new ServerSocketService();
-//		try {
-//			centerServerForServerSocketService.start(host, port, new CenterServerForServerMessageHandler(this, serverAgentManager));
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-	}
 }

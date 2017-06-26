@@ -1,8 +1,10 @@
 package game.util;
 
+import game.business.Business;
 import game.net.ClientNetService;
 import game.net.NetService;
 import game.net.ServerNetService;
+import game.net.UserNetService;
 import game.server.Server;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -48,7 +50,7 @@ public class ConfigUtil {
 			loadServerProperties();
 		}
 		String jsonString = (String) serverProperties.get(key);
-		logger.debug("getProperties(" + key + "):", jsonString);
+		logger.debug("getProperties(" + key + "):" + jsonString);
 		return (JSONObject) new JSONParser().parse(jsonString);
 	}
 
@@ -70,7 +72,7 @@ public class ConfigUtil {
 			id = server.getId();
 		}
 		JSONObject config2 = (JSONObject) config.get(id);
-		JSONObject config3 = (JSONObject) config2.get("serverNetService");
+		JSONObject config3 = (JSONObject) config2.get("ServerNetService");
 		if (config3 != null) {
 			for (Object o : config3.entrySet()) {
 				Map.Entry e = (Map.Entry) o;
@@ -78,10 +80,10 @@ public class ConfigUtil {
 				serverNetService.setName((String) e.getKey());
 				// 初始化其它配置
 				initNetService(serverNetService, server, (JSONObject) e.getValue());
-				server.add(serverNetService);
+				server.getServerNetServiceMap().put(serverNetService.getName(), serverNetService);
 			}
 		}
-		config3 = (JSONObject) config2.get("clientNetService");
+		config3 = (JSONObject) config2.get("ClientNetService");
 		if (config3 != null) {
 			for (Object o : config3.entrySet()) {
 				Map.Entry e = (Map.Entry) o;
@@ -89,20 +91,39 @@ public class ConfigUtil {
 				clientNetService.setName((String) e.getKey());
 				// 初始化其它配置
 				initNetService(clientNetService, server, (JSONObject) e.getValue());
-				server.add(clientNetService);
+				server.getClientNetServiceMap().put(clientNetService.getName(), clientNetService);
+			}
+		}
+		config3 = (JSONObject) config2.get("UserNetService");
+		if (config3 != null) {
+			for (Object o : config3.entrySet()) {
+				Map.Entry e = (Map.Entry) o;
+				UserNetService userNetService = new UserNetService();
+				userNetService.setName((String) e.getKey());
+				// 初始化其它配置
+				initNetService(userNetService, server, (JSONObject) e.getValue());
+				server.getUserNetServiceMap().put(userNetService.getName(), userNetService);
+			}
+		}
+		config3 = (JSONObject) config2.get("Business");
+		if (config3 != null) {
+			for (Object o : config3.entrySet()) {
+				Map.Entry e = (Map.Entry) o;
+				// 初始化其它配置
+				initBusiness(server, (String) e.getKey(), (JSONObject) e.getValue());
 			}
 		}
 	}
 
 	/**
-	 * 通过配置初始化套接字服务
+	 * 通过配置初始化网络服务
 	 *
-	 * @param socketService 套接字服务
-	 * @param server        服务器
-	 * @param config        配置
+	 * @param netService 网络服务
+	 * @param server     服务器
+	 * @param config     配置
 	 * @throws Exception 初始化异常
 	 */
-	private static void initNetService(NetService socketService, Server server, JSONObject config) throws Exception {
+	private static void initNetService(NetService netService, Server server, JSONObject config) throws Exception {
 		// host和port可以通过读取别的服务器配置获得
 		if (config.containsKey("targetService")) {
 			String[] targetService = ((String) config.get("targetService")).split("\\.");
@@ -110,13 +131,31 @@ public class ConfigUtil {
 			config2 = (JSONObject) config2.get(targetService[1]);
 			config2 = (JSONObject) config2.get(targetService[2]);
 			config2 = (JSONObject) config2.get(targetService[3]);
-			socketService.setHost((String) config2.get("host"));
-			socketService.setPort(Integer.parseInt((String) config2.get("port")));
+			netService.setHost((String) config2.get("host"));
+			netService.setPort(Integer.parseInt((String) config2.get("port")));
 		} else {
-			socketService.setHost((String) config.get("host"));
-			socketService.setPort(Integer.parseInt((String) config.get("port")));
+			netService.setHost((String) config.get("host"));
+			netService.setPort(Integer.parseInt((String) config.get("port")));
 		}
 		// 关联服务器和服务
-		socketService.setServer(server);
+		netService.setServer(server);
+	}
+
+	/**
+	 * 通过配置初始化业务
+	 *
+	 * @param server 服务器
+	 * @param name   业务名
+	 * @param config 配置
+	 * @throws Exception 初始化异常
+	 */
+	private static void initBusiness(Server server, String name, JSONObject config) throws Exception {
+		// 从名字找到对应的业务类，Server所在包名+业务类名
+		String className = server.getClass().getPackage().getName() + "." + name;
+		logger.debug("className:" + className);
+		Business business = (Business) Class.forName(className).newInstance();
+		business.setName(name);
+		// 关联服务器和服务
+		server.getBusinessManager().add(business);
 	}
 }

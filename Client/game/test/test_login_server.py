@@ -10,7 +10,7 @@ from game.client.client import Client
 def main():
 	client = Client()
 	lsp = client.get_login_server_agent()
-	lsp.start_socket_service('127.0.0.1', 18000)
+	lsp.start_socket_service('127.0.0.1', 18100)
 	lsp.to_ls_shake_hand({})
 	lsp.to_ls_login({
 		'account': '123',

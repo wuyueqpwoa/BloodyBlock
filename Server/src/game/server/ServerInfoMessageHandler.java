@@ -1,9 +1,8 @@
 package game.server;
 
-import game.common.message.CloneableMessageHandler;
-import game.common.message.Message;
-import game.common.message.ServerMessageHandler;
-import game.common.net.ServerAgent;
+import game.net.ServerAgent;
+import game.net.message.Message;
+import game.net.message.ServerMessageHandler;
 import org.msgpack.MessagePack;
 import org.msgpack.type.MapValue;
 
@@ -33,7 +32,7 @@ public class ServerInfoMessageHandler extends ServerMessageHandler {
 		gameWorldServerList.add("GWS_02");
 		gameWorldServerList.add("GWS_03");
 		newParameter.put("gws_list", gameWorldServerList);
-		newMessage.setAndPackParameterBytes(newParameter);
+		newMessage.setParameter(newParameter);
 //		send(newMessage, serverAgent);
 	}
 }

@@ -36,11 +36,12 @@ public class ServerNetService extends NetService {
 				channelPipeline.addLast("decoder", new MessageDecoder(getFrameLength()));
 				channelPipeline.addLast("encoder", new MessageEncoder());
 				ServerMessageHandler serverMessageHandler = new ServerMessageHandler();
-				serverMessageHandler.setAgentManager(context.getServer().getServerAgentManager());
-				serverMessageHandler.setMessageManager(context.getServer().getMessageManager());
+				serverMessageHandler.setServer(context.getServer());
 				channelPipeline.addLast(serverMessageHandler);
 			}
 		});
+		getLogger().info("initialized.");
+		channel = serverBootstrap.bind(getHost(), getPort()).sync().channel();
 	}
 
 	@Override

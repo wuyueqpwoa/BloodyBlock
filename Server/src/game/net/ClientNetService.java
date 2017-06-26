@@ -36,13 +36,20 @@ public class ClientNetService extends NetService {
 				channelPipeline.addLast("decoder", new MessageDecoder(getFrameLength()));
 				channelPipeline.addLast("encoder", new MessageEncoder());
 				ClientMessageHandler clientMessageHandler = new ClientMessageHandler();
-				clientMessageHandler.setAgentManager(context.getServer().getServerAgentManager());
-				clientMessageHandler.setMessageManager(context.getServer().getMessageManager());
+				clientMessageHandler.setServer(context.getServer());
 				channelPipeline.addLast(clientMessageHandler);
 			}
 		});
 		getLogger().info("initialized.");
-		channel = bootstrap.bind(getHost(), getPort()).sync().channel();
+		// 一直等待服务器上线
+		while (channel == null) {
+			try {
+				channel = bootstrap.connect(getHost(), getPort()).sync().channel();
+			} catch (Exception e) {
+				getLogger().debug("waiting server online...");
+				Thread.sleep(5000);
+			}
+		}
 	}
 
 	@Override

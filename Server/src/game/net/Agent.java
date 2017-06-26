@@ -1,6 +1,9 @@
 package game.net;
 
+import game.net.message.Message;
 import io.netty.channel.Channel;
+
+import java.io.IOException;
 
 /**
  * 代理
@@ -16,5 +19,15 @@ public class Agent {
 
 	public void setChannel(Channel channel) {
 		this.channel = channel;
+	}
+
+	/**
+	 * 输出消息
+	 *
+	 * @param message 消息
+	 * @throws IOException 输出异常
+	 */
+	public void writeAndFlush(Message message) throws IOException {
+		channel.writeAndFlush(Message.pack(message));
 	}
 }

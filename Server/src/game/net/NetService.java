@@ -76,9 +76,9 @@ public abstract class NetService {
 			logger.error("has been started.");
 			return;
 		}
-		logger.info("starting as server...");
+		logger.info("starting...at " + getHost() + ":" + getPort());
 		startService();
-		logger.info("started as server.");
+		logger.info("started.");
 	}
 
 	/**
@@ -88,12 +88,12 @@ public abstract class NetService {
 	 */
 	public void stop() throws Exception {
 		if (!isAlive()) {
-			getLogger().error("has been stopped.");
+			logger.error("has been stopped.");
 			return;
 		}
-		getLogger().info("stopping...");
+		logger.info("stopping...");
 		stopService();
-		getLogger().info("stopped.");
+		logger.info("stopped.");
 	}
 
 	/**

@@ -1,3 +1,4 @@
+import game.server.center.CenterServer;
 import game.server.login.LoginServer;
 
 /**
@@ -6,13 +7,14 @@ import game.server.login.LoginServer;
  */
 public class TestLoginServer {
 
-	private static void testServerForUser() throws Exception {
+	private static void testLoginServer() throws Exception {
 		LoginServer loginServer = new LoginServer();
 		loginServer.init();
 		System.out.println(loginServer);
+		loginServer.start();
 	}
 
 	public static void main(String[] args) throws Exception {
-		testServerForUser();
+		testLoginServer();
 	}
 }

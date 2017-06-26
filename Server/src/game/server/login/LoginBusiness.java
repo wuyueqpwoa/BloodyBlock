@@ -1,8 +1,8 @@
 package game.server.login;
 
-import game.common.message.Message;
-import game.common.message.UserMessageHandler;
-import game.common.net.UserAgent;
+import game.business.Business;
+import game.net.UserAgent;
+import game.net.message.Message;
 import game.net.security.AESUtil;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.msgpack.MessagePack;
@@ -13,13 +13,13 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * 登录服务器，面向用户端的消息处理者
- * Created by wuy on 2017/5/25.
+ * 登录业务
+ * Created by wuy on 2017/6/26.
  */
-public class LoginUserMessageHandler extends UserMessageHandler {
+public class LoginBusiness extends Business {
 
 	// 握手
-	public void shakeHand(UserAgent userAgent, Message message) throws IOException {
+	public Message shakeHand(Message message) throws IOException {
 		SecretKey aesKey = AESUtil.createSecretKey();
 		String hexKey = ByteUtils.toHexString(aesKey.getEncoded());
 		getLogger().info("key.getEncoded:" + ByteUtils.toHexString(aesKey.getEncoded()));
@@ -28,14 +28,17 @@ public class LoginUserMessageHandler extends UserMessageHandler {
 		Map<String, Object> newParameter = new HashMap<>();
 		newParameter.put("code", "0");
 		newParameter.put("aes_key", hexKey);
-		newMessage.setAndPackParameterBytes(newParameter);
-		send(newMessage, userAgent);
+		newMessage.setParameter(newParameter);
+		// 回调
+		UserAgent userAgent = (UserAgent) message.getAgent();
+		userAgent.writeAndFlush(newMessage);
 		// 设置aesKey
 		userAgent.setAesKey(aesKey);
+		return null;
 	}
 
 	// 登录
-	public void login(UserAgent userAgent, Message message) throws IOException {
+	public Message login(Message message) throws IOException {
 		MessagePack messagePack = new MessagePack();
 		Map<String, String> parameter = messagePack.read(message.getParameterBytes(), Templates.tMap(Templates.TString, Templates.TString));
 		getLogger().info("parameter:" + parameter);
@@ -48,12 +51,13 @@ public class LoginUserMessageHandler extends UserMessageHandler {
 		gameWorldServerList.add("GWS_02");
 		gameWorldServerList.add("GWS_03");
 		newParameter.put("gws_list", gameWorldServerList);
-		newMessage.setAndPackParameterBytes(newParameter);
-		send(newMessage, userAgent);
+		newMessage.setParameter(newParameter);
+		newMessage.setAgent(message.getAgent());
+		return newMessage;
 	}
 
 	// 选择游戏世界(返回的是网关服务器地址)
-	public void selectGameWorld(UserAgent userAgent, Message message) throws IOException {
+	public Message selectGameWorld(Message message) throws IOException {
 		MessagePack messagePack = new MessagePack();
 		Map<String, String> parameter = messagePack.read(message.getParameterBytes(), Templates.tMap(Templates.TString, Templates.TString));
 		getLogger().info("parameter:" + parameter);
@@ -65,9 +69,12 @@ public class LoginUserMessageHandler extends UserMessageHandler {
 		newParameter.put("port", "18100");
 		String token = UUID.randomUUID().toString();
 		newParameter.put("token", token);
-		newMessage.setAndPackParameterBytes(newParameter);
-		send(newMessage, userAgent);
+		newMessage.setParameter(newParameter);
+		// 回调
+		UserAgent userAgent = (UserAgent) message.getAgent();
+		userAgent.writeAndFlush(newMessage);
 		// 设置token
 		userAgent.setToken(token);
+		return null;
 	}
 }

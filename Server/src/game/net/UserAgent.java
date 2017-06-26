@@ -1,6 +1,12 @@
 package game.net;
 
+import game.net.message.Message;
+import game.net.security.AESUtil;
+import game.net.security.RSAPublicKeyUtil;
+import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
+
 import javax.crypto.SecretKey;
+import java.io.IOException;
 
 /**
  * 用户代理
@@ -41,6 +47,20 @@ public class UserAgent extends Agent {
 
 	public void setTokenValidTime(long tokenValidTime) {
 		this.tokenValidTime = tokenValidTime;
+	}
+
+	@Override
+	public void writeAndFlush(Message message) throws IOException {
+		byte[] bytes = Message.pack(message);
+		// 加密
+		if (aesKey == null) {
+			bytes = RSAPublicKeyUtil.encrypt(bytes);
+//			System.out.println("RSA bytes:" + ByteUtils.toHexString(bytes));
+		} else {
+			bytes = AESUtil.encrypt(bytes, aesKey);
+//			System.out.println("AES bytes:" + ByteUtils.toHexString(bytes));
+		}
+		getChannel().writeAndFlush(bytes);
 	}
 
 	@Override

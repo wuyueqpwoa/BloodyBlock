@@ -23,8 +23,7 @@ public class AgentManager<T extends Agent> {
 		try {
 			T agent = (T) agentClass.newInstance();
 			agent.setChannel(channel);
-			agentMap.put(channel.id().asShortText(), agent);
-			return agent;
+			return agentMap.put(channel.id().toString(), agent);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -38,7 +37,7 @@ public class AgentManager<T extends Agent> {
 	 * @return 代理
 	 */
 	synchronized public T get(Channel channel) {
-		return agentMap.get(channel.id().asShortText());
+		return agentMap.get(channel.id().toString());
 	}
 
 	/**
@@ -58,7 +57,7 @@ public class AgentManager<T extends Agent> {
 	 * @return 代理
 	 */
 	synchronized public T remove(Channel channel) {
-		return agentMap.remove(channel.id().asShortText());
+		return agentMap.remove(channel.id().toString());
 	}
 
 	/**

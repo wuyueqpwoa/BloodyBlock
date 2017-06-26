@@ -1,6 +1,6 @@
 package game.server;
 
-import game.business.BusinessService;
+import game.business.BusinessManager;
 import game.net.*;
 import game.util.ConfigUtil;
 import game.net.message.MessageManager;
@@ -21,22 +21,20 @@ public class Server {
 	private String type;
 	// 服务器ID，格式为"服务器类型_编号"
 	private String id;
-	// 服务器服务端网络服务Map
-	private Map<String, ServerNetService> serverNetServiceMap = new LinkedHashMap<>();
-	// 服务器客户端网络服务Map
-	private Map<String, ClientNetService> clientNetServiceMap = new LinkedHashMap<>();
 	// 服务器代理管理器
 	private AgentManager<ServerAgent> serverAgentManager = new AgentManager<>();
 	// 用户代理管理器
 	private AgentManager<UserAgent> userAgentManager = new AgentManager<>();
+	// 服务器服务端网络服务Map
+	private Map<String, ServerNetService> serverNetServiceMap = new LinkedHashMap<>();
+	// 服务器客户端网络服务Map
+	private Map<String, ClientNetService> clientNetServiceMap = new LinkedHashMap<>();
+	// 用户网络服务Map
+	private Map<String, UserNetService> userNetServiceMap = new LinkedHashMap<>();
 	// 消息管理器
 	private MessageManager messageManager = new MessageManager();
-	// 业务服务
-	private BusinessService businessService = new BusinessService();
-
-	public Server() {
-		businessService.setServer(this);
-	}
+	// 业务管理器
+	private BusinessManager businessManager = new BusinessManager();
 
 	public Logger getLogger() {
 		return logger;
@@ -59,77 +57,61 @@ public class Server {
 		this.type = id.split("_")[0];
 	}
 
-	public Map<String, ServerNetService> getServerNetServiceMap() {
-		return serverNetServiceMap;
-	}
-
-	public void setServerNetServiceMap(Map<String, ServerNetService> serverNetServiceMap) {
-		this.serverNetServiceMap = serverNetServiceMap;
-	}
-
-	public Map<String, ClientNetService> getClientNetServiceMap() {
-		return clientNetServiceMap;
-	}
-
-	public void setClientNetServiceMap(Map<String, ClientNetService> clientNetServiceMap) {
-		this.clientNetServiceMap = clientNetServiceMap;
-	}
-
 	public AgentManager<ServerAgent> getServerAgentManager() {
 		return serverAgentManager;
-	}
-
-	public void setServerAgentManager(AgentManager<ServerAgent> serverAgentManager) {
-		this.serverAgentManager = serverAgentManager;
 	}
 
 	public AgentManager<UserAgent> getUserAgentManager() {
 		return userAgentManager;
 	}
 
-	public void setUserAgentManager(AgentManager<UserAgent> userAgentManager) {
-		this.userAgentManager = userAgentManager;
+	public Map<String, ServerNetService> getServerNetServiceMap() {
+		return serverNetServiceMap;
+	}
+
+	public Map<String, ClientNetService> getClientNetServiceMap() {
+		return clientNetServiceMap;
+	}
+
+	public Map<String, UserNetService> getUserNetServiceMap() {
+		return userNetServiceMap;
 	}
 
 	public MessageManager getMessageManager() {
 		return messageManager;
 	}
 
-	public void setMessageManager(MessageManager messageManager) {
-		this.messageManager = messageManager;
-	}
-
-	public BusinessService getBusinessService() {
-		return businessService;
-	}
-
-	public void setBusinessService(BusinessService businessService) {
-		this.businessService = businessService;
+	public BusinessManager getBusinessManager() {
+		return businessManager;
 	}
 
 	/**
 	 * 初始化
 	 */
 	public void init() throws Exception {
+		// 通过配置文件初始化服务器
 		ConfigUtil.initServerByConfig(this);
+		businessManager.setServer(this);
+		businessManager.setMessageManager(messageManager);
 	}
 
 	/**
-	 * 添加服务端套接字服务
-	 *
-	 * @param serverNetService 服务端套接字服务
+	 * 启动
 	 */
-	public void add(ServerNetService serverNetService) {
-		serverNetServiceMap.put(serverNetService.getName(), serverNetService);
-	}
-
-	/**
-	 * 客户端套接字服务
-	 *
-	 * @param clientNetService 客户端套接字服务
-	 */
-	public void add(ClientNetService clientNetService) {
-		clientNetServiceMap.put(clientNetService.getName(), clientNetService);
+	public void start() throws Exception {
+		// 服务端模式
+		for (ServerNetService s : serverNetServiceMap.values()) {
+			s.start();
+		}
+		// 客户端模式，一直等待服务器上线
+		for (ClientNetService s : clientNetServiceMap.values()) {
+			s.start();
+		}
+		// 服务端模式
+		for (UserNetService s : userNetServiceMap.values()) {
+			s.start();
+		}
+		businessManager.start();
 	}
 
 	@Override
@@ -137,10 +119,13 @@ public class Server {
 		return "Server{" +
 				"type='" + type + '\'' +
 				", id='" + id + '\'' +
-				", serverNetServiceMap size=" + serverNetServiceMap.size() +
-				", clientNetServiceMap size=" + clientNetServiceMap.size() +
 				", serverAgentManager size=" + serverAgentManager.size() +
 				", userAgentManager size=" + userAgentManager.size() +
+				", serverNetServiceMap size=" + serverNetServiceMap.size() +
+				", clientNetServiceMap size=" + clientNetServiceMap.size() +
+				", userNetServiceMap size=" + userNetServiceMap.size() +
+				", messageManager size=" + messageManager.size() +
+				", businessManager size=" + businessManager.size() +
 				'}';
 	}
 }

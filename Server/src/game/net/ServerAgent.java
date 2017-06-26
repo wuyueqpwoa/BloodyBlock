@@ -9,7 +9,7 @@ import io.netty.channel.Channel;
 public class ServerAgent extends Agent {
 
 	private Channel channel;
-	// 是否为套接字服务端
+	// 是否为服务端
 	private boolean isServer;
 	// 服务器ID
 	private String id;
