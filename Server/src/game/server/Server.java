@@ -7,8 +7,7 @@ import game.net.message.MessageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 服务器，功能全面

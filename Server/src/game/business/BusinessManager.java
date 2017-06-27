@@ -114,16 +114,18 @@ public class BusinessManager {
 
 	// 处理消息
 	private void handle(Message message) throws Exception {
-		// 消息的目标服务器ID与本服务器相等
-		if (server.getId().equals(message.getDestinationServerId())) {
-			// 找到调用方法
-			Business business = businessMap.get(message.getInvokeMethodName());
-			Method method = methodMap.get(message.getInvokeMethodName());
-			Message newMessage = (Message) method.invoke(business, message);
-			// 回调
-			if (newMessage != null) {
-				newMessage.getAgent().writeAndFlush(newMessage);
-			}
+		// 找到调用方法
+		String invokeMethodName = message.getInvokeMethodName();
+		Business business = businessMap.get(invokeMethodName);
+		if (business == null) {
+			invokeMethodName = "defaultHandle";
+			business = businessMap.get(invokeMethodName);
+		}
+		Method method = methodMap.get(invokeMethodName);
+		Message newMessage = (Message) method.invoke(business, message);
+		// 回调
+		if (newMessage != null) {
+			newMessage.getAgent().writeAndFlush(newMessage);
 		}
 	}
 

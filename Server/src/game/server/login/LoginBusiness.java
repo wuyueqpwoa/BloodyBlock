@@ -3,7 +3,7 @@ package game.server.login;
 import game.business.Business;
 import game.net.UserAgent;
 import game.net.message.Message;
-import game.net.security.AESUtil;
+import game.util.security.AESUtil;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.msgpack.MessagePack;
 import org.msgpack.template.Templates;
@@ -46,13 +46,13 @@ public class LoginBusiness extends Business {
 		newMessage.setInvokeMethodName(message.getCallbackMethodName());
 		Map<String, Object> newParameter = new HashMap<>();
 		newParameter.put("code", "0");
-		List<String> gameWorldServerList = new ArrayList<>();
-		gameWorldServerList.add("GWS_01");
-		gameWorldServerList.add("GWS_02");
-		gameWorldServerList.add("GWS_03");
-		newParameter.put("gws_list", gameWorldServerList);
+//		List<String> gameWorldServerList = new ArrayList<>();
+//		gameWorldServerList.add("GWS_01");
+//		gameWorldServerList.add("GWS_02");
+//		gameWorldServerList.add("GWS_03");
+//		newParameter.put("gws_list", gameWorldServerList);
 		newMessage.setParameter(newParameter);
-		newMessage.setAgent(message.getAgent());
+		newMessage.setAgent(getServer().getServerAgentManager().get("ES_01"));
 		return newMessage;
 	}
 

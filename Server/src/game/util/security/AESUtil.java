@@ -1,4 +1,4 @@
-package game.net.security;
+package game.util.security;
 
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.slf4j.Logger;

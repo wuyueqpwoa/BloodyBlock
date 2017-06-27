@@ -1,7 +1,7 @@
 package game.net.message;
 
-import game.net.security.AESUtil;
-import game.net.security.RSAPrivateKeyUtil;
+import game.util.security.AESUtil;
+import game.util.security.RSAPrivateKeyUtil;
 import game.net.UserAgent;
 import io.netty.channel.ChannelHandlerContext;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
@@ -26,8 +26,10 @@ public class UserMessageHandler extends MessageHandler {
 		}
 		// 解包
 		Message message = Message.unpack(bytes);
+		if (!getServer().getBusinessManager().getBusinessMap().containsKey(message.getInvokeMethodName())) {
+			throw new Exception("unknown invoke method name:" + message.getInvokeMethodName());
+		}
 		message.setSourceUserChannelId(ctx.channel().id().toString());
-		message.setDestinationServerId(getServer().getId());
 		message.setAgent(userAgent);
 		getServer().getMessageManager().putLast(message);
 	}

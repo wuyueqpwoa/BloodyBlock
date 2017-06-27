@@ -1,5 +1,6 @@
 package game.net.message;
 
+import game.net.NetService;
 import game.server.Server;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -15,6 +16,8 @@ public abstract class MessageHandler extends SimpleChannelInboundHandler<byte[]>
 	final private Logger logger = LoggerFactory.getLogger(this.getClass());
 	// 服务器
 	private Server server;
+	// 网络服务
+	private NetService netService;
 
 	public Logger getLogger() {
 		return logger;
@@ -26,6 +29,14 @@ public abstract class MessageHandler extends SimpleChannelInboundHandler<byte[]>
 
 	public void setServer(Server server) {
 		this.server = server;
+	}
+
+	public NetService getNetService() {
+		return netService;
+	}
+
+	public void setNetService(NetService netService) {
+		this.netService = netService;
 	}
 
 	@Override

@@ -37,6 +37,7 @@ public class ServerNetService extends NetService {
 				channelPipeline.addLast("encoder", new MessageEncoder());
 				ServerMessageHandler serverMessageHandler = new ServerMessageHandler();
 				serverMessageHandler.setServer(context.getServer());
+				serverMessageHandler.setNetService(context);
 				channelPipeline.addLast(serverMessageHandler);
 			}
 		});

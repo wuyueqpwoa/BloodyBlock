@@ -1,9 +1,8 @@
 package game.net;
 
 import game.net.message.Message;
-import game.net.security.AESUtil;
-import game.net.security.RSAPublicKeyUtil;
-import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
+import game.util.security.AESUtil;
+import game.util.security.RSAPublicKeyUtil;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;

@@ -37,19 +37,13 @@ public class ClientNetService extends NetService {
 				channelPipeline.addLast("encoder", new MessageEncoder());
 				ClientMessageHandler clientMessageHandler = new ClientMessageHandler();
 				clientMessageHandler.setServer(context.getServer());
+				clientMessageHandler.setNetService(context);
 				channelPipeline.addLast(clientMessageHandler);
 			}
 		});
 		getLogger().info("initialized.");
 		// 一直等待服务器上线
-		while (channel == null) {
-			try {
-				channel = bootstrap.connect(getHost(), getPort()).sync().channel();
-			} catch (Exception e) {
-				getLogger().debug("waiting server online...");
-				Thread.sleep(5000);
-			}
-		}
+		connect();
 	}
 
 	@Override
@@ -63,5 +57,27 @@ public class ClientNetService extends NetService {
 	@Override
 	public boolean isAlive() {
 		return channel != null;
+	}
+
+	/**
+	 * 连接
+	 */
+	public void connect() throws InterruptedException {
+		while (channel == null) {
+			try {
+				channel = bootstrap.connect(getHost(), getPort()).sync().channel();
+			} catch (Exception e) {
+				getLogger().debug("waiting server online...at " + getHost() + ":" + getPort());
+				Thread.sleep(5000);
+			}
+		}
+	}
+
+	/**
+	 * 重连接
+	 */
+	public void reConnect() throws InterruptedException {
+		channel = null;
+		connect();
 	}
 }

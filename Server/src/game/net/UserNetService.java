@@ -37,6 +37,7 @@ public class UserNetService extends NetService {
 				channelPipeline.addLast("encoder", new MessageEncoder());
 				UserMessageHandler userMessageHandler = new UserMessageHandler();
 				userMessageHandler.setServer(context.getServer());
+				userMessageHandler.setNetService(context);
 				channelPipeline.addLast(userMessageHandler);
 			}
 		});

@@ -19,15 +19,14 @@ public class AgentManager<T extends Agent> {
 	 * @param channel    通道
 	 * @param agentClass 代理类
 	 */
-	synchronized public T add(Channel channel, Class agentClass) {
+	synchronized public void add(Channel channel, Class agentClass) {
 		try {
 			T agent = (T) agentClass.newInstance();
 			agent.setChannel(channel);
-			return agentMap.put(channel.id().toString(), agent);
+			agentMap.put(channel.id().toString(), agent);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
 	}
 
 	/**

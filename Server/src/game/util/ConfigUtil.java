@@ -110,7 +110,7 @@ public class ConfigUtil {
 			for (Object o : config3.entrySet()) {
 				Map.Entry e = (Map.Entry) o;
 				// 初始化其它配置
-				initBusiness(server, (String) e.getKey(), (JSONObject) e.getValue());
+				initBusiness(server, (String) e.getKey(), (String) e.getValue());
 			}
 		}
 	}
@@ -144,17 +144,19 @@ public class ConfigUtil {
 	/**
 	 * 通过配置初始化业务
 	 *
-	 * @param server 服务器
-	 * @param name   业务名
-	 * @param config 配置
+	 * @param server    服务器
+	 * @param name      业务名
+	 * @param className 类名
 	 * @throws Exception 初始化异常
 	 */
-	private static void initBusiness(Server server, String name, JSONObject config) throws Exception {
-		// 从名字找到对应的业务类，Server所在包名+业务类名
-		String className = server.getClass().getPackage().getName() + "." + name;
+	private static void initBusiness(Server server, String name, String className) throws Exception {
+		if ("".equals(className)) {
+			// 从名字找到对应的业务类，Server所在包名+业务类名
+			className = server.getClass().getPackage().getName() + "." + name;
+		}
 		logger.debug("className:" + className);
 		Business business = (Business) Class.forName(className).newInstance();
-		business.setName(name);
+		business.setServer(server);
 		// 关联服务器和服务
 		server.getBusinessManager().add(business);
 	}

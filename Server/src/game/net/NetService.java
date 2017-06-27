@@ -103,7 +103,6 @@ public abstract class NetService {
 	 */
 	public abstract void startService() throws Exception;
 
-
 	/**
 	 * 停止服务
 	 *

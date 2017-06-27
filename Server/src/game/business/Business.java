@@ -11,18 +11,18 @@ import org.slf4j.LoggerFactory;
 public class Business {
 
 	final private Logger logger = LoggerFactory.getLogger(this.getClass());
-	// 服务名称
-	private String name;
+	// 服务器
+	private Server server;
 
 	public Logger getLogger() {
 		return logger;
 	}
 
-	public String getName() {
-		return name;
+	public Server getServer() {
+		return server;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setServer(Server server) {
+		this.server = server;
 	}
 }

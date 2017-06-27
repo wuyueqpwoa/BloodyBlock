@@ -1,6 +1,8 @@
 package game.net.message;
 
 import game.net.Agent;
+import game.net.ClientNetService;
+import game.net.ServerAgent;
 import io.netty.channel.ChannelHandlerContext;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 
@@ -23,7 +25,14 @@ public class ClientMessageHandler extends MessageHandler {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		getLogger().info("channelActive:" + ctx.channel());
-		getServer().getServerAgentManager().add(ctx.channel(), Agent.class);
+		getServer().getServerAgentManager().add(ctx.channel(), ServerAgent.class);
+		// 服务端上线
+		Message message = new Message();
+		message.setSourceServerId(getServer().getId());
+		message.setInvokeMethodName("clientOnline");
+		ServerAgent serverAgent = getServer().getServerAgentManager().get(ctx.channel());
+		serverAgent.writeAndFlush(message);
+		serverAgent.setServer(true);
 		super.channelActive(ctx);
 	}
 
@@ -33,5 +42,7 @@ public class ClientMessageHandler extends MessageHandler {
 		getLogger().info("channelInactive:" + ctx.channel());
 		getServer().getServerAgentManager().remove(ctx.channel());
 		super.channelInactive(ctx);
+		// 重连
+		((ClientNetService) getNetService()).reConnect();
 	}
 }

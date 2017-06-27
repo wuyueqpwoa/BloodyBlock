@@ -8,19 +8,10 @@ import io.netty.channel.Channel;
  */
 public class ServerAgent extends Agent {
 
-	private Channel channel;
 	// 是否为服务端
 	private boolean isServer;
 	// 服务器ID
 	private String id;
-
-	public Channel getChannel() {
-		return channel;
-	}
-
-	public void setChannel(Channel channel) {
-		this.channel = channel;
-	}
 
 	public boolean isServer() {
 		return isServer;
