@@ -103,6 +103,8 @@ public class BusinessManager {
 						handle(message);
 					} catch (Exception e) {
 						logger.error("business error:", e);
+						// 出错了就断开连接，避免进一步危害
+						message.getAgent().getChannel().disconnect();
 					}
 					long endTime = System.currentTimeMillis();
 					logger.info("business end at:" + endTime + ", it takes:" + (endTime - startTime));
@@ -116,11 +118,10 @@ public class BusinessManager {
 	private void handle(Message message) throws Exception {
 		// 找到调用方法
 		String invokeMethodName = message.getInvokeMethodName();
-		Business business = businessMap.get(invokeMethodName);
-		if (business == null) {
+		if (!businessMap.containsKey(invokeMethodName)) {
 			invokeMethodName = "defaultHandle";
-			business = businessMap.get(invokeMethodName);
 		}
+		Business business = businessMap.get(invokeMethodName);
 		Method method = methodMap.get(invokeMethodName);
 		Message newMessage = (Message) method.invoke(business, message);
 		// 回调

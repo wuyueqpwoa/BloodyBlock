@@ -2,7 +2,7 @@ import game.server.exchange.ExchangeServer;
 
 /**
  * 测试交换服务器
- * Created by wuy on 2017/5/21.
+ * Created by wuy on 2017/6/27.
  */
 public class TestExchangeServer {
 

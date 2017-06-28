@@ -1,4 +1,4 @@
-package game.net;
+package game.net.agent;
 
 import io.netty.channel.Channel;
 
@@ -11,6 +11,7 @@ import java.util.Map;
  */
 public class AgentManager<T extends Agent> {
 
+	// 通道ID为key
 	private Map<String, T> agentMap = new LinkedHashMap<>();
 
 	/**
@@ -40,16 +41,6 @@ public class AgentManager<T extends Agent> {
 	}
 
 	/**
-	 * 获得代理
-	 *
-	 * @param id ID
-	 * @return 代理
-	 */
-	synchronized public T get(String id) {
-		return agentMap.get(id);
-	}
-
-	/**
 	 * 移除代理
 	 *
 	 * @param channel 通道
@@ -57,16 +48,6 @@ public class AgentManager<T extends Agent> {
 	 */
 	synchronized public T remove(Channel channel) {
 		return agentMap.remove(channel.id().toString());
-	}
-
-	/**
-	 * 移除代理
-	 *
-	 * @param id ID
-	 * @return 代理
-	 */
-	synchronized public T remove(String id) {
-		return agentMap.remove(id);
 	}
 
 	/**

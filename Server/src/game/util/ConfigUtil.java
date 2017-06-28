@@ -6,6 +6,7 @@ import game.net.NetService;
 import game.net.ServerNetService;
 import game.net.UserNetService;
 import game.server.Server;
+import game.server.UserServer;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -23,7 +24,7 @@ import java.util.Properties;
 public class ConfigUtil {
 
 	final private static Logger logger = LoggerFactory.getLogger(ConfigUtil.class);
-	private static Properties serverProperties;
+	private static Properties serverProperties = new Properties();
 
 	/**
 	 * 加载服务器配置
@@ -32,7 +33,6 @@ public class ConfigUtil {
 	 * @throws IOException 配置文件读取异常
 	 */
 	public static Properties loadServerProperties() throws IOException {
-		serverProperties = new Properties();
 		serverProperties.load(ConfigUtil.class.getResourceAsStream("/server.properties"));
 		return serverProperties;
 	}
@@ -46,9 +46,6 @@ public class ConfigUtil {
 	 * @throws ParseException JSON解析异常
 	 */
 	public static JSONObject getServerProperties(String key) throws IOException, ParseException {
-		if (serverProperties == null) {
-			loadServerProperties();
-		}
 		String jsonString = (String) serverProperties.get(key);
 		logger.debug("getProperties(" + key + "):" + jsonString);
 		return (JSONObject) new JSONParser().parse(jsonString);
@@ -62,6 +59,7 @@ public class ConfigUtil {
 	 * @throws Exception 初始化异常
 	 */
 	public static void initServerByConfig(Server server) throws Exception {
+		loadServerProperties();
 		JSONObject config = ConfigUtil.getServerProperties(server.getClass().getSimpleName());
 		String id;
 		// 如果服务器设置了id，则读取相应id的配置，否则默认第一个配置
@@ -80,7 +78,8 @@ public class ConfigUtil {
 				serverNetService.setName((String) e.getKey());
 				// 初始化其它配置
 				initNetService(serverNetService, server, (JSONObject) e.getValue());
-				server.getServerNetServiceMap().put(serverNetService.getName(), serverNetService);
+				server.getServerNetServiceManager()
+						.getServerNetServiceMap().put(serverNetService.getName(), serverNetService);
 			}
 		}
 		config3 = (JSONObject) config2.get("ClientNetService");
@@ -91,7 +90,8 @@ public class ConfigUtil {
 				clientNetService.setName((String) e.getKey());
 				// 初始化其它配置
 				initNetService(clientNetService, server, (JSONObject) e.getValue());
-				server.getClientNetServiceMap().put(clientNetService.getName(), clientNetService);
+				server.getServerNetServiceManager()
+						.getClientNetServiceMap().put(clientNetService.getName(), clientNetService);
 			}
 		}
 		config3 = (JSONObject) config2.get("UserNetService");
@@ -102,15 +102,24 @@ public class ConfigUtil {
 				userNetService.setName((String) e.getKey());
 				// 初始化其它配置
 				initNetService(userNetService, server, (JSONObject) e.getValue());
-				server.getUserNetServiceMap().put(userNetService.getName(), userNetService);
+				((UserServer) server).getUserNetServiceManager()
+						.getUserNetServiceMap().put(userNetService.getName(), userNetService);
 			}
 		}
-		config3 = (JSONObject) config2.get("Business");
+		config3 = (JSONObject) config2.get("ServerBusiness");
 		if (config3 != null) {
 			for (Object o : config3.entrySet()) {
 				Map.Entry e = (Map.Entry) o;
 				// 初始化其它配置
-				initBusiness(server, (String) e.getKey(), (String) e.getValue());
+				initBusiness(server, (String) e.getKey(), (String) e.getValue(), true);
+			}
+		}
+		config3 = (JSONObject) config2.get("UserBusiness");
+		if (config3 != null) {
+			for (Object o : config3.entrySet()) {
+				Map.Entry e = (Map.Entry) o;
+				// 初始化其它配置
+				initBusiness(server, (String) e.getKey(), (String) e.getValue(), false);
 			}
 		}
 	}
@@ -144,12 +153,13 @@ public class ConfigUtil {
 	/**
 	 * 通过配置初始化业务
 	 *
-	 * @param server    服务器
-	 * @param name      业务名
-	 * @param className 类名
+	 * @param server           服务器
+	 * @param name             业务名
+	 * @param className        类名
+	 * @param isServerBusiness 是否服务器业务
 	 * @throws Exception 初始化异常
 	 */
-	private static void initBusiness(Server server, String name, String className) throws Exception {
+	private static void initBusiness(Server server, String name, String className, boolean isServerBusiness) throws Exception {
 		if ("".equals(className)) {
 			// 从名字找到对应的业务类，Server所在包名+业务类名
 			className = server.getClass().getPackage().getName() + "." + name;
@@ -157,6 +167,7 @@ public class ConfigUtil {
 		logger.debug("className:" + className);
 		Business business = (Business) Class.forName(className).newInstance();
 		business.setServer(server);
+		business.setServerBusiness(isServerBusiness);
 		// 关联服务器和服务
 		server.getBusinessManager().add(business);
 	}

@@ -1,8 +1,7 @@
 package game.net.message;
 
-import game.net.Agent;
 import game.net.ClientNetService;
-import game.net.ServerAgent;
+import game.net.agent.ServerAgent;
 import io.netty.channel.ChannelHandlerContext;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 

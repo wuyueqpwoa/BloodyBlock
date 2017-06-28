@@ -1,6 +1,4 @@
-package game.net;
-
-import io.netty.channel.Channel;
+package game.net.agent;
 
 /**
  * 服务器代理
@@ -12,6 +10,8 @@ public class ServerAgent extends Agent {
 	private boolean isServer;
 	// 服务器ID
 	private String id;
+	// 服务器类型
+	private String type;
 
 	public boolean isServer() {
 		return isServer;
@@ -27,5 +27,14 @@ public class ServerAgent extends Agent {
 
 	public void setId(String id) {
 		this.id = id;
+		this.type = id.split("_")[0];
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 }

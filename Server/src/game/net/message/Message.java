@@ -1,6 +1,6 @@
 package game.net.message;
 
-import game.net.Agent;
+import game.net.agent.Agent;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.msgpack.MessagePack;
 import org.msgpack.template.Templates;
@@ -167,13 +167,25 @@ public class Message {
 
 	@Override
 	public String toString() {
-		return "Message{" +
-				"sourceUserChannelId='" + sourceUserChannelId + '\'' +
-				", sourceServerId='" + sourceServerId + '\'' +
-				", destinationServerId='" + destinationServerId + '\'' +
-				", invokeMethodName='" + invokeMethodName + '\'' +
-				", parameterBytes=" + (parameterBytes == null ? null : ByteUtils.toHexString(parameterBytes)) +
-				", callbackMethodName='" + callbackMethodName + '\'' +
-				'}';
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("{").append("invokeMethodName=").append(invokeMethodName);
+		if (parameterBytes != null) {
+			stringBuilder.append(", parameterBytes=")
+					.append((parameterBytes == null ? null : ByteUtils.toHexString(parameterBytes)));
+		}
+		if (callbackMethodName != null) {
+			stringBuilder.append(", callbackMethodName=").append(callbackMethodName);
+		}
+		if (sourceUserChannelId != null) {
+			stringBuilder.append(", sourceUserChannelId=").append(sourceUserChannelId);
+		}
+		if (sourceServerId != null) {
+			stringBuilder.append(", sourceServerId=").append(sourceServerId);
+		}
+		if (destinationServerId != null) {
+			stringBuilder.append(", destinationServerId=").append(destinationServerId);
+		}
+		stringBuilder.append("}");
+		return stringBuilder.toString();
 	}
 }

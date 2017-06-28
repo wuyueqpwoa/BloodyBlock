@@ -13,6 +13,8 @@ public class Business {
 	final private Logger logger = LoggerFactory.getLogger(this.getClass());
 	// 服务器
 	private Server server;
+	// 是否服务器业务
+	private boolean isServerBusiness;
 
 	public Logger getLogger() {
 		return logger;
@@ -24,5 +26,13 @@ public class Business {
 
 	public void setServer(Server server) {
 		this.server = server;
+	}
+
+	public boolean isServerBusiness() {
+		return isServerBusiness;
+	}
+
+	public void setServerBusiness(boolean serverBusiness) {
+		isServerBusiness = serverBusiness;
 	}
 }

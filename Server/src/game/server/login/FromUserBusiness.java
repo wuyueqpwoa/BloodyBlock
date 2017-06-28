@@ -1,7 +1,7 @@
 package game.server.login;
 
 import game.business.Business;
-import game.net.UserAgent;
+import game.net.agent.UserAgent;
 import game.net.message.Message;
 import game.util.security.AESUtil;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
@@ -13,10 +13,10 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * 登录业务
+ * 来自用户的业务
  * Created by wuy on 2017/6/26.
  */
-public class LoginBusiness extends Business {
+public class FromUserBusiness extends Business {
 
 	// 握手
 	public Message shakeHand(Message message) throws IOException {
@@ -51,6 +51,8 @@ public class LoginBusiness extends Business {
 //		gameWorldServerList.add("GWS_02");
 //		gameWorldServerList.add("GWS_03");
 //		newParameter.put("gws_list", gameWorldServerList);
+		newMessage.setDestinationServerId("GS_01");
+		newMessage.setInvokeMethodName("prepareAcceptUser");
 		newMessage.setParameter(newParameter);
 		newMessage.setAgent(getServer().getServerAgentManager().get("ES_01"));
 		return newMessage;

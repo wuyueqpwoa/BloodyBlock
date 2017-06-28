@@ -1,4 +1,4 @@
-package game.net;
+package game.net.agent;
 
 import game.net.message.Message;
 import game.util.security.AESUtil;
