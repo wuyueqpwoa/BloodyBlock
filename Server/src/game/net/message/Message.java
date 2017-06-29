@@ -17,27 +17,30 @@ import java.util.Map;
  */
 public class Message {
 
-	// 来源用户通道ID
-	private String sourceUserChannelId;
-	// 来源服务器ID
-	private String sourceServerId;
 	// 目标服务器ID，如果是客户端的消息，一般由登录服务器或网关服务器强写本字段
 	private String destinationServerId;
+	// 来源服务器ID
+	private String sourceServerId;
 	// 调用方法名
 	private String invokeMethodName;
 	// 参数(MessagePack打包)
 	private byte[] parameterBytes;
 	// 回调方法名
 	private String callbackMethodName;
+	// 来源用户通道ID
+	private String userChannelId;
+	// 回调方法名(用户)
+	private String userCallbackMethodName;
+
 	// 代理(非打包字段)
 	private Agent agent;
 
-	public String getSourceUserChannelId() {
-		return sourceUserChannelId;
+	public String getDestinationServerId() {
+		return destinationServerId;
 	}
 
-	public void setSourceUserChannelId(String sourceUserChannelId) {
-		this.sourceUserChannelId = sourceUserChannelId;
+	public void setDestinationServerId(String destinationServerId) {
+		this.destinationServerId = destinationServerId;
 	}
 
 	public String getSourceServerId() {
@@ -46,14 +49,6 @@ public class Message {
 
 	public void setSourceServerId(String sourceServerId) {
 		this.sourceServerId = sourceServerId;
-	}
-
-	public String getDestinationServerId() {
-		return destinationServerId;
-	}
-
-	public void setDestinationServerId(String destinationServerId) {
-		this.destinationServerId = destinationServerId;
 	}
 
 	public String getInvokeMethodName() {
@@ -78,6 +73,22 @@ public class Message {
 
 	public void setCallbackMethodName(String callbackMethodName) {
 		this.callbackMethodName = callbackMethodName;
+	}
+
+	public String getUserChannelId() {
+		return userChannelId;
+	}
+
+	public void setUserChannelId(String userChannelId) {
+		this.userChannelId = userChannelId;
+	}
+
+	public String getUserCallbackMethodName() {
+		return userCallbackMethodName;
+	}
+
+	public void setUserCallbackMethodName(String userCallbackMethodName) {
+		this.userCallbackMethodName = userCallbackMethodName;
 	}
 
 	public Agent getAgent() {
@@ -107,29 +118,31 @@ public class Message {
 	/**
 	 * 打包消息
 	 *
-	 * @param message 消息
 	 * @return 消息字节
 	 * @throws IOException 打包异常
 	 */
-	public static byte[] pack(Message message) throws IOException {
+	public byte[] pack() throws IOException {
 		Map<String, Object> temp = new HashMap<>();
-		if (message.getSourceUserChannelId() != null) {
-			temp.put("u", message.getSourceUserChannelId());
+		if (userChannelId != null) {
+			temp.put("u", userChannelId);
 		}
-		if (message.getSourceServerId() != null) {
-			temp.put("s", message.getSourceServerId());
+		if (destinationServerId != null) {
+			temp.put("d", destinationServerId);
 		}
-		if (message.getDestinationServerId() != null) {
-			temp.put("d", message.getDestinationServerId());
+		if (sourceServerId != null) {
+			temp.put("s", sourceServerId);
 		}
-		if (message.getInvokeMethodName() != null) {
-			temp.put("i", message.getInvokeMethodName());
+		if (invokeMethodName != null) {
+			temp.put("i", invokeMethodName);
 		}
-		if (message.getParameterBytes() != null) {
-			temp.put("p", message.getParameterBytes());
+		if (parameterBytes != null) {
+			temp.put("p", parameterBytes);
 		}
-		if (message.getCallbackMethodName() != null) {
-			temp.put("c", message.getCallbackMethodName());
+		if (callbackMethodName != null) {
+			temp.put("c", callbackMethodName);
+		}
+		if (userCallbackMethodName != null) {
+			temp.put("uc", userCallbackMethodName);
 		}
 		return new MessagePack().write(temp);
 	}
@@ -138,37 +151,80 @@ public class Message {
 	 * 解包消息
 	 *
 	 * @param bytes 消息字节
-	 * @return 消息
 	 * @throws IOException 解包异常
 	 */
-	public static Message unpack(byte[] bytes) throws IOException {
+	public Message unpack(byte[] bytes) throws IOException {
 		MessagePack messagePack = new MessagePack();
 		MapValue mapValue = messagePack.read(bytes).asMapValue();
-		Message message = new Message();
 		for (Value k : mapValue.keySet()) {
 			String key = messagePack.convert(k, Templates.TString);
 			Value v = mapValue.get(k);
 			if ("u".equals(key)) {
-				message.setSourceUserChannelId(messagePack.convert(v, Templates.TString));
-			} else if ("s".equals(key)) {
-				message.setSourceServerId(messagePack.convert(v, Templates.TString));
+				userChannelId = messagePack.convert(v, Templates.TString);
 			} else if ("d".equals(key)) {
-				message.setDestinationServerId(messagePack.convert(v, Templates.TString));
+				destinationServerId = messagePack.convert(v, Templates.TString);
+			} else if ("s".equals(key)) {
+				sourceServerId = messagePack.convert(v, Templates.TString);
 			} else if ("i".equals(key)) {
-				message.setInvokeMethodName(messagePack.convert(v, Templates.TString));
+				invokeMethodName = messagePack.convert(v, Templates.TString);
 			} else if ("p".equals(key)) {
-				message.setParameterBytes(messagePack.convert(v, Templates.TByteArray));
+				parameterBytes = messagePack.convert(v, Templates.TByteArray);
 			} else if ("c".equals(key)) {
-				message.setCallbackMethodName(messagePack.convert(v, Templates.TString));
+				callbackMethodName = messagePack.convert(v, Templates.TString);
+			} else if ("uc".equals(key)) {
+				userCallbackMethodName = messagePack.convert(v, Templates.TString);
 			}
 		}
-		return message;
+		return this;
+	}
+
+	/**
+	 * 打包消息(用户)
+	 *
+	 * @return 消息字节
+	 * @throws IOException 打包异常
+	 */
+	public byte[] packForUser() throws IOException {
+		Map<String, Object> temp = new HashMap<>();
+		if (getInvokeMethodName() != null) {
+			temp.put("i", getInvokeMethodName());
+		}
+		if (getParameterBytes() != null) {
+			temp.put("p", getParameterBytes());
+		}
+		if (getCallbackMethodName() != null) {
+			temp.put("c", getCallbackMethodName());
+		}
+		return new MessagePack().write(temp);
+	}
+
+	/**
+	 * 解包消息(用户)
+	 *
+	 * @param bytes 消息字节
+	 * @throws IOException 解包异常
+	 */
+	public Message unpackForUser(byte[] bytes) throws IOException {
+		MessagePack messagePack = new MessagePack();
+		MapValue mapValue = messagePack.read(bytes).asMapValue();
+		for (Value k : mapValue.keySet()) {
+			String key = messagePack.convert(k, Templates.TString);
+			Value v = mapValue.get(k);
+			if ("i".equals(key)) {
+				setInvokeMethodName(messagePack.convert(v, Templates.TString));
+			} else if ("p".equals(key)) {
+				setParameterBytes(messagePack.convert(v, Templates.TByteArray));
+			} else if ("c".equals(key)) {
+				setCallbackMethodName(messagePack.convert(v, Templates.TString));
+			}
+		}
+		return this;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("{").append("invokeMethodName=").append(invokeMethodName);
+		stringBuilder.append("Message{").append("invokeMethodName=").append(invokeMethodName);
 		if (parameterBytes != null) {
 			stringBuilder.append(", parameterBytes=")
 					.append((parameterBytes == null ? null : ByteUtils.toHexString(parameterBytes)));
@@ -176,16 +232,31 @@ public class Message {
 		if (callbackMethodName != null) {
 			stringBuilder.append(", callbackMethodName=").append(callbackMethodName);
 		}
-		if (sourceUserChannelId != null) {
-			stringBuilder.append(", sourceUserChannelId=").append(sourceUserChannelId);
+		if (destinationServerId != null) {
+			stringBuilder.append(", destinationServerId=").append(destinationServerId);
 		}
 		if (sourceServerId != null) {
 			stringBuilder.append(", sourceServerId=").append(sourceServerId);
 		}
-		if (destinationServerId != null) {
-			stringBuilder.append(", destinationServerId=").append(destinationServerId);
+		if (userChannelId != null) {
+			stringBuilder.append(", userChannelId=").append(userChannelId);
+		}
+		if (userCallbackMethodName != null) {
+			stringBuilder.append(", userCallbackMethodName=").append(userCallbackMethodName);
 		}
 		stringBuilder.append("}");
 		return stringBuilder.toString();
+	}
+
+	public Message clone() {
+		Message newMessage = new Message();
+		newMessage.setDestinationServerId(destinationServerId);
+		newMessage.setSourceServerId(sourceServerId);
+		newMessage.setInvokeMethodName(invokeMethodName);
+		newMessage.setParameterBytes(parameterBytes);
+		newMessage.setCallbackMethodName(callbackMethodName);
+		newMessage.setUserChannelId(userChannelId);
+		newMessage.setUserCallbackMethodName(userCallbackMethodName);
+		return newMessage;
 	}
 }

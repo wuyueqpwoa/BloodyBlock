@@ -50,7 +50,7 @@ public class UserAgent extends Agent {
 
 	@Override
 	public void writeAndFlush(Message message) throws IOException {
-		byte[] bytes = Message.pack(message);
+		byte[] bytes = message.packForUser();
 		// 加密
 		if (aesKey == null) {
 			bytes = RSAPublicKeyUtil.encrypt(bytes);

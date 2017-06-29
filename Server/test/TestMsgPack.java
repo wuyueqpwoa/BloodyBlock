@@ -33,7 +33,7 @@ public class TestMsgPack {
 		MessagePack messagePack = new MessagePack();
 		MapValue mapValue = messagePack.read(raw).asMapValue();
 //		for (Value v : mapValue.keySet()) {
-//			Value temp = mapValue.get(v);
+//			Value temp = mapValue.getByServerId(v);
 //			System.out.println(v + ":" + temp);
 //		}
 		return mapValue;

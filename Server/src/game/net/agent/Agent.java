@@ -28,6 +28,6 @@ public class Agent {
 	 * @throws IOException 输出异常
 	 */
 	public void writeAndFlush(Message message) throws IOException {
-		channel.writeAndFlush(Message.pack(message));
+		channel.writeAndFlush(message.pack());
 	}
 }

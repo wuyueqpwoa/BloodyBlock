@@ -42,20 +42,12 @@ public class FromUserBusiness extends Business {
 		MessagePack messagePack = new MessagePack();
 		Map<String, String> parameter = messagePack.read(message.getParameterBytes(), Templates.tMap(Templates.TString, Templates.TString));
 		getLogger().info("parameter:" + parameter);
-		Message newMessage = new Message();
-		newMessage.setInvokeMethodName(message.getCallbackMethodName());
-		Map<String, Object> newParameter = new HashMap<>();
-		newParameter.put("code", "0");
-//		List<String> gameWorldServerList = new ArrayList<>();
-//		gameWorldServerList.add("GWS_01");
-//		gameWorldServerList.add("GWS_02");
-//		gameWorldServerList.add("GWS_03");
-//		newParameter.put("gws_list", gameWorldServerList);
-		newMessage.setDestinationServerId("GS_01");
-		newMessage.setInvokeMethodName("prepareAcceptUser");
-		newMessage.setParameter(newParameter);
-		newMessage.setAgent(getServer().getServerAgentManager().get("ES_01"));
-		return newMessage;
+		message.setDestinationServerId("DS_01");
+		message.setSourceServerId(getServer().getId());
+		message.setInvokeMethodName("checkAccount");
+		message.setCallbackMethodName("checkAccountResult");
+		message.setAgent(getServer().getServerAgentManager().getByServerId("ES_01"));
+		return message;
 	}
 
 	// 选择游戏世界(返回的是网关服务器地址)

@@ -34,14 +34,15 @@ public class UserMessageHandler extends MessageHandler {
 //			getLogger().debug("AES bytes:" + ByteUtils.toHexString(bytes));
 		}
 		// 解包
-		Message message = Message.unpack(bytes);
+		Message message = new Message().unpackForUser(bytes);
 		// 过滤非法请求
 		Map<String, Business> businessMap = getServer().getBusinessManager().getBusinessMap();
 		if (!businessMap.containsKey(message.getInvokeMethodName())
 				|| businessMap.get(message.getInvokeMethodName()).isServerBusiness()) {
 			throw new Exception("illegal message:" + message);
 		}
-		message.setSourceUserChannelId(ctx.channel().id().toString());
+		message.setUserChannelId(ctx.channel().id().toString());
+		message.setUserCallbackMethodName(message.getCallbackMethodName());
 		message.setAgent(userAgent);
 		getServer().getMessageManager().putLast(message);
 	}

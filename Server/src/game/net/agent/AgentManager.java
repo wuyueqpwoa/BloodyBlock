@@ -41,6 +41,16 @@ public class AgentManager<T extends Agent> {
 	}
 
 	/**
+	 * 获得代理
+	 *
+	 * @param id 通道ID
+	 * @return 代理
+	 */
+	synchronized public T get(String id) {
+		return agentMap.get(id);
+	}
+
+	/**
 	 * 移除代理
 	 *
 	 * @param channel 通道

@@ -24,7 +24,15 @@ import java.util.Properties;
 public class ConfigUtil {
 
 	final private static Logger logger = LoggerFactory.getLogger(ConfigUtil.class);
-	private static Properties serverProperties = new Properties();
+	final private static Properties serverProperties = new Properties();
+
+	static {
+		try {
+			loadServerProperties();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * 加载服务器配置
@@ -59,7 +67,6 @@ public class ConfigUtil {
 	 * @throws Exception 初始化异常
 	 */
 	public static void initServerByConfig(Server server) throws Exception {
-		loadServerProperties();
 		JSONObject config = ConfigUtil.getServerProperties(server.getClass().getSimpleName());
 		String id;
 		// 如果服务器设置了id，则读取相应id的配置，否则默认第一个配置

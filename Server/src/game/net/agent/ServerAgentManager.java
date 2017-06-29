@@ -39,7 +39,7 @@ public class ServerAgentManager extends AgentManager<ServerAgent> {
 	 * @param id 服务器ID
 	 * @return 代理
 	 */
-	synchronized public ServerAgent get(String id) {
+	synchronized public ServerAgent getByServerId(String id) {
 		return serverAgentMap.get(id);
 	}
 

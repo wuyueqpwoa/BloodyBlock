@@ -1,3 +1,4 @@
+import game.server.database.DatabaseServer;
 import game.server.exchange.ExchangeServer;
 import game.server.gateway.GatewayServer;
 import game.server.login.LoginServer;
@@ -23,6 +24,13 @@ public class TestServer {
 		loginServer.init();
 		System.out.println(loginServer);
 		loginServer.start();
+	}
+
+	public static void testDatabaseServer() throws Exception {
+		DatabaseServer databaseServer = new DatabaseServer();
+		databaseServer.init();
+		System.out.println(databaseServer);
+		databaseServer.start();
 	}
 
 	public static void testGatewayServer() throws Exception {

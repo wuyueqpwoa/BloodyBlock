@@ -21,7 +21,7 @@ public class FromOtherServerBusiness extends Business {
 			clientOnline(message);
 		} else {
 			// 需要转发的消息
-			ServerAgent targetAgent = getServer().getServerAgentManager().get(message.getDestinationServerId());
+			ServerAgent targetAgent = getServer().getServerAgentManager().getByServerId(message.getDestinationServerId());
 			if (targetAgent == null) {
 				getLogger().error("unknown destination server id:" + message.getDestinationServerId());
 				// 服务器间连接出现问题

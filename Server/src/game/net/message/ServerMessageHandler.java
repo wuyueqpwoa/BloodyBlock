@@ -14,7 +14,7 @@ public class ServerMessageHandler extends MessageHandler {
 	protected void channelRead0(ChannelHandlerContext ctx, byte[] bytes) throws Exception {
 		getLogger().info("channelRead0:" + ByteUtils.toHexString(bytes));
 		// 解包
-		Message message = Message.unpack(bytes);
+		Message message = new Message().unpack(bytes);
 		message.setAgent(getServer().getServerAgentManager().get(ctx.channel()));
 		getServer().getMessageManager().putLast(message);
 	}
